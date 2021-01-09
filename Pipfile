@@ -1,0 +1,23 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pathlib2 = "*"
+pytest = "*"
+codecov = "*"
+pytest-cov = "*"
+scandir = "*"
+pyyaml = "*"
+mock = "*"
+
+[packages]
+# bookmarks-parser = "*"
+beautifulsoup4 = "*"
+html5lib = "*"
+bookmark = {editable = true,path = "."}
+typer = "*"
+
+[requires]
+python_version = "3.8"

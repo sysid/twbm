@@ -1,0 +1,3 @@
+exclude archive
+exclude *.py
+include __init__.py buku.py
