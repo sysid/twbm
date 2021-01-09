@@ -18,6 +18,7 @@ beautifulsoup4 = "*"
 html5lib = "*"
 bookmark = {editable = true,path = "."}
 typer = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.8"

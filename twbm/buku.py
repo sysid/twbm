@@ -1402,7 +1402,8 @@ class BukuDb:
         keyword_results = keyword_results if keyword_results is not None else []
         stag_results = self.search_by_tag(''.join(stag))
         stag_results = stag_results if stag_results is not None else []
-        return list(set(keyword_results) & set(stag_results))
+        # tw: sorting
+        return sorted(list(set(keyword_results) & set(stag_results)), key=lambda x: x[2].upper())
 
     def exclude_results_from_search(self, search_results, without, deep):
         """Excludes records that match keyword search using without parameters

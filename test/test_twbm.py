@@ -22,6 +22,11 @@ TEST_TEMP_DIR_PATH = '/tmp/bukutest'
 TEST_TEMP_DBDIR_PATH = os.path.join(TEST_TEMP_DIR_PATH, 'buku')
 TEST_TEMP_DBFILE_PATH = os.path.join(TEST_TEMP_DBDIR_PATH, 'bookmarks.db')
 
+"""
+test for sort order:
+cls; python ./twbm/buku.py --db bm.db --np -t 'bb + py' --deep -- test
+"""
+
 
 @pytest.fixture()
 def setup():
