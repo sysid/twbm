@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 import pytest
 import yaml
 
-from load_db import BukuDb
+from twbm.load_db import BukuDb
 
 _log = logging.getLogger(__name__)
 # log_fmt = r'%(asctime)-15s %(levelname)s %(name)s %(funcName)s:%(lineno)d %(message)s'

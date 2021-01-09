@@ -26,13 +26,13 @@ test:
 clean:
 	@echo "Cleaning up..."
 	#git clean -Xdf
-	rm -rf dist
+	rm -rf ./dist
 
 build:
 	@echo "building"
-	git add .
-	git commit
-	git push
+#	git add .
+#	git commit
+#	git push
 	python setup.py sdist
 
 upload: build
