@@ -44,9 +44,15 @@ setup(
     author_email='sysid@gmx.de',
     packages=get_packages('twbm'),
     entry_points={
-        'console_scripts': ['buku=buku:main']
+        'console_scripts': ['twbm=twbm:main']
     },
-    install_requires=[],
+    install_requires=[
+        'beautifulsoup4>=4.4.1',
+        'certifi',
+        'cryptography>=1.2.3',
+        'urllib3>=1.23',
+        'html5lib>=1.0.1',
+    ],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
