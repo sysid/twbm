@@ -13,5 +13,3 @@ if __name__ == '__main__':
     r = queries.create_db(conn)
     print(r)
 
-    r = queries.create_trigger(conn)
-    print(r)

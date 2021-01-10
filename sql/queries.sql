@@ -2,18 +2,17 @@
 select *
 from bookmarks;
 
--- name: create_db
+-- name: create_db#
 CREATE TABLE IF NOT EXISTS "main"."bookmarks" (
     "id" INTEGER PRIMARY KEY,
     "URL" TEXT NOT NULL UNIQUE,
     "metadata" text default '',
     "tags" text default ',',
     "desc" text default '',
-    "flags" text default '',
+    "flags" integer default '',
     "last_update_ts" DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- name: create_trigger
 CREATE TRIGGER [UpdateLastTime]
     AFTER
     UPDATE

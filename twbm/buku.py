@@ -100,6 +100,30 @@ LOGGER = logging.getLogger()
 LOGDBG = LOGGER.debug
 LOGERR = LOGGER.error
 
+sql_str = """
+-- name: create_db#
+CREATE TABLE IF NOT EXISTS "main"."bookmarks" (
+    "id" INTEGER PRIMARY KEY,
+    "URL" TEXT NOT NULL UNIQUE,
+    "metadata" text default '',
+    "tags" text default ',',
+    "desc" text default '',
+    "flags" integer default '',
+    "last_update_ts" DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TRIGGER [UpdateLastTime]
+    AFTER
+    UPDATE
+    ON bookmarks
+    FOR EACH ROW
+    WHEN NEW.last_update_ts <= OLD.last_update_ts
+BEGIN
+    update bookmarks set last_update_ts=CURRENT_TIMESTAMP where id=OLD.id;
+END;
+"""
+queries = aiosql.from_str(sql_str, "sqlite3")
+
 
 class BukuCrypt:
     """Class to handle encryption and decryption of
@@ -481,15 +505,7 @@ class BukuDb:
             # flags: designed to be extended in future using bitwise masks
             # Masks:
             #     0b00000001: set title immutable
-            cur.execute('CREATE TABLE if not exists bookmarks ('
-                        'id integer PRIMARY KEY, '
-                        'URL text NOT NULL UNIQUE, '
-                        'metadata text default \'\', '
-                        'tags text default \',\', '
-                        'desc text default \'\', '
-                        'flags integer default 0)')
-            # queries = aiosql.from_path("../sql/queries.sql", "sqlite3")
-            # queries.create_db(conn)
+            queries.create_db(conn)
             conn.commit()
         except Exception as e:
             LOGERR('initdb(): %s', e)

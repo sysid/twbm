@@ -7,7 +7,8 @@ from tempfile import TemporaryDirectory
 import pytest
 import yaml
 
-from twbm.load_db import BukuDb
+# from twbm.load_db import BukuDb
+from twbm.buku import BukuDb
 
 _log = logging.getLogger(__name__)
 # log_fmt = r'%(asctime)-15s %(levelname)s %(name)s %(funcName)s:%(lineno)d %(message)s'
@@ -79,43 +80,42 @@ def test_initdb(setup):
     conn.close()
 
 
-@pytest.mark.parametrize('add_pt', [True])
-def test_load_chrome_database(chrome_db, db, add_pt):
-    """test method."""
-    # compatibility
-    json_file = chrome_db[0]
+class ChromeTests:
+    @pytest.mark.parametrize('add_pt', [True])
+    def test_load_chrome_database(self, chrome_db, db, add_pt):
+        """test method."""
+        # compatibility
+        json_file = chrome_db[0]
 
-    db.load_chrome_database(json_file, None, add_pt)
-    _ = None
+        db.load_chrome_database(json_file, None, add_pt)
+        _ = None
 
+    @pytest.mark.parametrize('add_pt', [True, False])
+    def test_load_chrome_database_mock(self, chrome_db, db, add_pt):
+        """test method."""
+        # compatibility
+        json_file = chrome_db[0]
 
-@pytest.mark.parametrize('add_pt', [True, False])
-def test_load_chrome_database_mock(chrome_db, db, add_pt):
-    """test method."""
-    # compatibility
-    json_file = chrome_db[0]
+        # with parent-tags and without
+        res_yaml_file = chrome_db[1] if add_pt else chrome_db[2]
 
-    # with parent-tags and without
-    res_yaml_file = chrome_db[1] if add_pt else chrome_db[2]
+        with open(res_yaml_file, 'r') as f:
+            try:
+                res_yaml = yaml.load(f, Loader=yaml.FullLoader)
+            except RuntimeError:
+                res_yaml = yaml.load(f, Loader=PrettySafeLoader)
 
-    with open(res_yaml_file, 'r') as f:
-        try:
-            res_yaml = yaml.load(f, Loader=yaml.FullLoader)
-        except RuntimeError:
-            res_yaml = yaml.load(f, Loader=PrettySafeLoader)
+        # this results in NOT having DB entries!!!
+        # db.add_rec = mock.Mock()
+        db.load_chrome_database(json_file, None, add_pt)
+        # call_args_list_dict = dict(db.add_rec.call_args_list)
+        # assert call_args_list_dict == res_yaml
+        _ = None
 
-    # this results in NOT having DB entries!!!
-    # db.add_rec = mock.Mock()
-    db.load_chrome_database(json_file, None, add_pt)
-    # call_args_list_dict = dict(db.add_rec.call_args_list)
-    # assert call_args_list_dict == res_yaml
-    _ = None
-
-
-def test_traverse_bm_folder(db, data):
-    bookmark_bar = data['roots']['bookmark_bar']
-    for item in db.traverse_bm_folder(bookmark_bar['children'], unique_tag=None, folder_name='Bookmarks bar',
-                                      add_parent_folder_as_tag=True):
-        if 'SearchPreview' in item[1]:
-            assert item[2] == ',bookmarks bar,f+,xxx,yyy,'
-        print(item)
+    def test_traverse_bm_folder(self, db, data):
+        bookmark_bar = data['roots']['bookmark_bar']
+        for item in db.traverse_bm_folder(bookmark_bar['children'], unique_tag=None, folder_name='Bookmarks bar',
+                                          add_parent_folder_as_tag=True):
+            if 'SearchPreview' in item[1]:
+                assert item[2] == ',bookmarks bar,f+,xxx,yyy,'
+            print(item)
