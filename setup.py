@@ -52,6 +52,7 @@ setup(
         'cryptography>=1.2.3',
         'urllib3>=1.23',
         'html5lib>=1.0.1',
+        'aiosql>=3.2.0'
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
