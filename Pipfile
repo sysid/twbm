@@ -19,6 +19,7 @@ html5lib = "*"
 bookmark = {editable = true,path = "."}
 typer = "*"
 ipython = "*"
+aiosql = "*"
 
 [requires]
 python_version = "3.8"

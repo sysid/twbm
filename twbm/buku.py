@@ -43,6 +43,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 import webbrowser
 import certifi
 import urllib3
+from aiosql import aiosql
 from urllib3.exceptions import LocationParseError
 from urllib3.util import parse_url, make_headers, Retry
 from bs4 import BeautifulSoup
@@ -487,6 +488,8 @@ class BukuDb:
                         'tags text default \',\', '
                         'desc text default \'\', '
                         'flags integer default 0)')
+            # queries = aiosql.from_path("../sql/queries.sql", "sqlite3")
+            # queries.create_db(conn)
             conn.commit()
         except Exception as e:
             LOGERR('initdb(): %s', e)
