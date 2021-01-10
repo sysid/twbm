@@ -3,7 +3,7 @@ select *
 from bookmarks;
 
 -- name: create_db#
-CREATE TABLE IF NOT EXISTS "main"."bookmarks" (
+CREATE TABLE IF NOT EXISTS "main"."bookmarks2" (
     "id" INTEGER PRIMARY KEY,
     "URL" TEXT NOT NULL UNIQUE,
     "metadata" text default '',
@@ -13,14 +13,14 @@ CREATE TABLE IF NOT EXISTS "main"."bookmarks" (
     "last_update_ts" DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TRIGGER [UpdateLastTime]
+CREATE TRIGGER IF NOT EXISTS [UpdateLastTime]
     AFTER
     UPDATE
-    ON bookmarks
+    ON bookmarks2
     FOR EACH ROW
     WHEN NEW.last_update_ts <= OLD.last_update_ts
 BEGIN
-    update bookmarks set last_update_ts=CURRENT_TIMESTAMP where id=OLD.id;
+    update bookmarks2 set last_update_ts=CURRENT_TIMESTAMP where id=OLD.id;
 END;
 
 /*
