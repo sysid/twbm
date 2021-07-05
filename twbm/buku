@@ -22,9 +22,11 @@ from itertools import chain
 import argparse
 import calendar
 import cgi
+import codecs
 import collections
 import contextlib
 import json
+import locale
 import logging
 import os
 import platform
@@ -37,11 +39,12 @@ import subprocess
 from subprocess import Popen, PIPE, DEVNULL
 import sys
 import tempfile
+import textwrap
 import threading
 import time
 from typing import Any, Dict, Iterable, List, Optional, Tuple
+import unicodedata
 import webbrowser
-import certifi
 import urllib3
 from urllib3.exceptions import LocationParseError
 from urllib3.util import parse_url, make_headers, Retry
@@ -57,7 +60,7 @@ try:
 except ImportError:
     TypedDict = None  # type: ignore
 
-__version__ = '4.5'
+__version__ = '4.6'
 __author__ = 'Arun Prakash Jana <engineerarun@gmail.com>'
 __license__ = 'GPLv3'
 
@@ -73,7 +76,9 @@ ID_DB_STR = '%d. %s'
 MUTE_STR = '%s (L)\n'
 URL_STR = '   > %s\n'
 DESC_STR = '   + %s\n'
+DESC_WRAP = '%s%s'
 TAG_STR = '   # %s\n'
+TAG_WRAP = '%s%s'
 
 # Colormap for color output from "googler" project
 COLORMAP = {k: '\x1b[%sm' % v for k, v in {
@@ -88,7 +93,7 @@ COLORMAP = {k: '\x1b[%sm' % v for k, v in {
     'x': '0', 'X': '1', 'y': '7', 'Y': '7;1', 'z': '2',
 }.items()}
 
-USER_AGENT = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0'
+USER_AGENT = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0'
 MYHEADERS = None  # Default dictionary of headers
 MYPROXY = None  # Default proxy
 TEXT_BROWSERS = ['elinks', 'links', 'links2', 'lynx', 'w3m', 'www-browser']
@@ -98,6 +103,16 @@ IGNORE_FF_BOOKMARK_FOLDERS = frozenset(["placesRoot", "bookmarksMenuFolder"])
 LOGGER = logging.getLogger()
 LOGDBG = LOGGER.debug
 LOGERR = LOGGER.error
+
+# Define the default path to ca-certificates
+# In Linux distros with openssl, it is /etc/ssl/certs/ca-certificates.crt
+# Fall back to use `certifi` otherwise
+try:
+    os.path.isfile('/etc/ssl/certs/ca-certificates.crt')
+    CA_CERTS = '/etc/ssl/certs/ca-certificates.crt'
+except Exception:
+    import certifi
+    CA_CERTS = certifi.where()
 
 
 class BukuCrypt:
@@ -1460,17 +1475,17 @@ class BukuDb:
 
     def delete_rec(
             self,
-            index: int,
+            index: int = None,
             low: int = 0,
             high: int = 0,
             is_range: bool = False,
             delay_commit: bool = False
     ) -> bool:
-        """Delete a single record or remove the table if index is None.
+        """Delete a single record or remove the table if index is 0.
 
         Parameters
         ----------
-        index : int
+        index : int, optional
             DB index of deleted entry.
         low : int, optional
             Actual lower index of range.
@@ -1478,8 +1493,7 @@ class BukuDb:
             Actual higher index of range.
         is_range : bool, optional
             A range is passed using low and high arguments.
-            An index is ignored if is_range is True (use dummy index).
-            Default is False.
+            An index is ignored if is_range is True.
         delay_commit : bool, optional
             True if record should not be committed to the DB,
             leaving commit responsibility to caller. Default is False.
@@ -1493,7 +1507,58 @@ class BukuDb:
         -------
         bool
             True on success, False on failure.
+
+        Examples
+        --------
+        >>> from tempfile import NamedTemporaryFile
+        >>> import buku
+        >>> sdb = buku.BukuDb(dbfile=NamedTemporaryFile().name)  # single record database
+        >>> sdb.add_rec('https://example.com')
+        1
+        >>> sdb.delete_rec(1)
+        Index 1 deleted
+        True
+
+        Delete record with default range.
+
+        >>> sdb = buku.BukuDb(dbfile=NamedTemporaryFile().name)
+        >>> sdb.add_rec('https://example.com')
+        1
+        >>> sdb.delete_rec(is_range=True)  # doctest: +SKIP
+        Remove ALL bookmarks? (y/n): y
+        All bookmarks deleted
+        True
+
+        Running the function without any parameter will raise TypeError.
+
+        >>> sdb = buku.BukuDb(dbfile=NamedTemporaryFile().name)
+        >>> sdb.add_rec('https://example.com')
+        1
+        >>> sdb.delete_rec()
+        Traceback (most recent call last):
+        ...
+        TypeError: index, low, or high variable is not integer
+
+        Negative number on `high` and `low` paramaters when is_range is True
+        will log error and return False
+
+        >>> edb = buku.BukuDb(dbfile=NamedTemporaryFile().name)
+        >>> edb.delete_rec(low=-1, high=-1, is_range=True)
+        False
+
+        Remove the table
+
+        >>> sdb = buku.BukuDb(dbfile=NamedTemporaryFile().name)
+        >>> sdb.delete_rec(0)  # doctest: +SKIP
+        Remove ALL bookmarks? (y/n): y
+        All bookmarks deleted
+        True
         """
+        params = [low, high]
+        if not is_range:
+            params.append(index)
+        if any(map(lambda x: not isinstance(x, int), params)):
+            raise TypeError('index, low, or high variable is not integer')
 
         if is_range:  # Delete a range of indices
             if low < 0 or high < 0:
@@ -1663,6 +1728,8 @@ class BukuDb:
 
         A negative index behaves like tail, if title is blank show "Untitled".
 
+        Empty database check will run when `index` < 0 and `is_range` is False.
+
         Parameters
         -----------
         index : int, optional
@@ -1673,16 +1740,45 @@ class BukuDb:
             Actual higher index of range.
         is_range : bool, optional
             A range is passed using low and high arguments.
-            An index is ignored if is_range is True (use dummy index).
-            Default is False.
+            An index is ignored if is_range is True.
 
         Returns
         -------
         bool
             True on success, False on failure.
-        """
 
-        if index < 0:
+        Examples
+        --------
+        >>> import buku
+        >>> from tempfile import NamedTemporaryFile
+        >>> edb = buku.BukuDb(dbfile=NamedTemporaryFile().name)  # empty database
+        >>> edb.print_rec()
+        True
+
+        Print negative index on empty database will log error and return False
+
+        >>> edb.print_rec(-3)
+        False
+
+        print non empty database with default argument.
+
+        >>> sdb = buku.BukuDb(dbfile=NamedTemporaryFile().name)  # single record database
+        >>> sdb.add_rec('https://example.com')
+        1
+        >>> assert sdb.print_rec()
+        1. Example Domain
+           > https://example.com
+        <BLANKLINE>
+
+        Negative number on `high` and `low` paramaters when is_range is True
+        will log error and return False
+
+        >>> sdb.print_rec(low=-1, high=-1, is_range=True)
+        False
+        >>> edb.print_rec(low=-1, high=-1, is_range=True)
+        False
+        """
+        if not is_range and index < 0:
             # Show the last n records
             _id = self.get_max_id()
             if _id == -1:
@@ -1729,7 +1825,7 @@ class BukuDb:
             elif self.json:
                 write_string_to_file(format_json(results, True, self.field_filter), self.json)
             else:
-                print(format_json(results, True, self.field_filter))
+                print_json_safe(results, True, self.field_filter)
 
             return True
         else:  # Show all entries
@@ -1745,7 +1841,7 @@ class BukuDb:
         elif self.json:
             write_string_to_file(format_json(resultset, field_filter=self.field_filter), self.json)
         else:
-            print(format_json(resultset, field_filter=self.field_filter))
+            print_json_safe(resultset, field_filter=self.field_filter)
 
         return True
 
@@ -2138,28 +2234,23 @@ class BukuDb:
             print('%s exported' % count)
             return True
 
-        try:
-            outfp = open(filepath, mode='w', encoding='utf-8')
-        except Exception as e:
-            LOGERR(e)
-            return False
-
-        res = {}  # type: Dict
-        if filepath.endswith('.md'):
-            res = convert_bookmark_set(resultset, 'markdown')
-            count += res['count']
-            outfp.write(res['data'])
-        elif filepath.endswith('.org'):
-            res = convert_bookmark_set(resultset, 'org')
-            count += res['count']
-            outfp.write(res['data'])
-        else:
-            res = convert_bookmark_set(resultset, 'html')
-            count += res['count']
-            outfp.write(res['data'])
-        outfp.close()
-        print('%s exported' % count)
-        return True
+        with open(filepath, mode='w', encoding='utf-8') as outfp:
+            res = {}  # type: Dict
+            if filepath.endswith('.md'):
+                res = convert_bookmark_set(resultset, 'markdown')
+                count += res['count']
+                outfp.write(res['data'])
+            elif filepath.endswith('.org'):
+                res = convert_bookmark_set(resultset, 'org')
+                count += res['count']
+                outfp.write(res['data'])
+            else:
+                res = convert_bookmark_set(resultset, 'html')
+                count += res['count']
+                outfp.write(res['data'])
+            print('%s exported' % count)
+            return True
+        return False
 
     def traverse_bm_folder(self, sublist, unique_tag, folder_name, add_parent_folder_as_tag):
         """Traverse bookmark folders recursively and find bookmarks.
@@ -2574,7 +2665,7 @@ class BukuDb:
         if MYPROXY is None:
             gen_headers()
 
-        ca_certs = os.getenv('BUKU_CA_CERTS', default=certifi.where())
+        ca_certs = os.getenv('BUKU_CA_CERTS', default=CA_CERTS)
         if MYPROXY:
             manager = urllib3.ProxyManager(
                 MYPROXY,
@@ -3000,7 +3091,19 @@ def import_md(filepath: str, newtag: Optional[str]):
                     if is_nongeneric_url(url):
                         continue
 
-                    yield (url, title, delim_wrap(newtag), None, 0, True)
+                    # Find tag start delimiter
+                    tag_start_delim = line.find('<!-- TAGS: ')
+                    # Reverse find tag end delimiter
+                    tag_end_delim = line.rfind(' -->')
+
+                    if tag_start_delim != -1 and tag_end_delim > 0:
+                        tags = newtag + ',' + line[tag_start_delim + 11:tag_end_delim]
+                    else:
+                        tags = newtag
+
+                    parse_tags([tags])
+
+                    yield (url, title, delim_wrap(tags), None, 0, True, False)
 
 def import_org(filepath: str, newtag: Optional[str]):
     """Parse bookmark org file.
@@ -3075,7 +3178,7 @@ def import_org(filepath: str, newtag: Optional[str]):
                         if newtag.lower() not in tags:
                             tags_string = (newtag + DELIM) + tags_string
 
-                    yield (url, title, delim_wrap(tags_string), None, 0, True)
+                    yield (url, title, delim_wrap(tags_string), None, 0, True, False)
 
 def import_firefox_json(json, add_bookmark_folder_as_tag=False, unique_tag=None):
     """Open Firefox JSON export file and import data.
@@ -3546,7 +3649,7 @@ def get_PoolManager():
     ProxyManager or PoolManager
         ProxyManager if https_proxy is defined, PoolManager otherwise.
     """
-    ca_certs = os.getenv('BUKU_CA_CERTS', default=certifi.where())
+    ca_certs = os.getenv('BUKU_CA_CERTS', default=CA_CERTS)
     if MYPROXY:
         return urllib3.ProxyManager(MYPROXY, num_pools=1, headers=MYHEADERS, timeout=15,
                                     cert_reqs='CERT_REQUIRED', ca_certs=ca_certs)
@@ -3853,11 +3956,16 @@ def prompt(obj, results, noninteractive=False, deep=False, listtags=False, sugge
     if listtags:
         show_taglist(obj)
 
+    try:
+        columns, _ = os.get_terminal_size()
+    except OSError:
+        columns = 0
+
     if noninteractive:
         try:
             for row in results:
                 count += 1
-                print_single_rec(row, count)
+                print_single_rec(row, count, columns)
         except Exception:
             pass
         finally:
@@ -3875,7 +3983,8 @@ def prompt(obj, results, noninteractive=False, deep=False, listtags=False, sugge
                     print()
                     for row in results[cur_index:next_index]:
                         count += 1
-                        print_single_rec(row, count)
+                        print_single_rec(row, count, columns)
+                    print('%d-%d/%d' % (cur_index + 1, next_index, total_results))
                 else:
                     print('No more results')
             else:
@@ -4145,7 +4254,11 @@ def print_rec_with_filter(records, field_filter=0):
     try:
         if field_filter == 0:
             for row in records:
-                print_single_rec(row)
+                try:
+                    columns, _ = os.get_terminal_size()
+                except OSError:
+                    columns = 0
+                print_single_rec(row, columns=columns)
         elif field_filter == 1:
             for row in records:
                 print('%s\t%s' % (row[0], row[1]))
@@ -4181,7 +4294,7 @@ def print_rec_with_filter(records, field_filter=0):
         sys.exit(1)
 
 
-def print_single_rec(row: BookmarkVar, idx: Optional[int] = 0):  # NOQA
+def print_single_rec(row: BookmarkVar, idx: Optional[int]=0, columns: Optional[int]=0):  # NOQA
     """Print a single DB record.
 
     Handles both search results and individual record.
@@ -4192,6 +4305,9 @@ def print_single_rec(row: BookmarkVar, idx: Optional[int] = 0):  # NOQA
         Tuple representing bookmark record data.
     idx : int, optional
         Search result index. If 0, print with DB index.
+        Default is 0.
+    columns : int, optional
+        Number of columns to wrap comments to.
         Default is 0.
     """
 
@@ -4208,20 +4324,49 @@ def print_single_rec(row: BookmarkVar, idx: Optional[int] = 0):  # NOQA
         else:
             id_title_res += '\n'
 
-    str_list.append(id_title_res)
-    str_list.append(URL_STR % (row[1]))
-    if row[4]:
-        str_list.append(DESC_STR % (row[4]))
-    if row[3] != DELIM:
-        str_list.append(TAG_STR % (row[3][1:-1]))
-
     try:
-        print(''.join(str_list))
+        print(id_title_res, end='')
+        print(URL_STR % (row[1]), end='')
+        if columns == 0:
+            if row[4]:
+                print(DESC_STR % (row[4]), end='')
+            if row[3] != DELIM:
+                print(TAG_STR % (row[3][1:-1]), end='')
+            print()
+            return
+
+        INDENT = 5
+        ln_num = 1
+        fillwidth = columns - INDENT
+
+        for line in textwrap.wrap(row[4].replace('\n', ''), width=fillwidth):
+            if ln_num == 1:
+                print(DESC_STR % line, end='')
+                ln_num += 1
+            else:
+                print(DESC_WRAP % (' ' * INDENT, line))
+
+        ln_num = 1
+        for line in textwrap.wrap(row[3][1:-1].replace('\n', ''), width=fillwidth):
+            if ln_num == 1:
+                print(TAG_STR % line, end='')
+                ln_num += 1
+            else:
+                print(TAG_WRAP % (' ' * INDENT, line))
+        print()
     except UnicodeEncodeError:
+        str_list = []
+        str_list.append(id_title_res)
+        str_list.append(URL_STR % (row[1]))
+        if row[4]:
+            str_list.append(DESC_STR % (row[4]))
+        if row[3] != DELIM:
+            str_list.append(TAG_STR % (row[3][1:-1]))
         sys.stdout.buffer.write((''.join(str_list) + '\n').encode('utf-8'))
     except BrokenPipeError:
         sys.stdout = os.fdopen(1)
         sys.exit(1)
+
 
 def write_string_to_file(content: str, filepath: str):
     """Writes given content to file
@@ -4241,6 +4386,7 @@ def write_string_to_file(content: str, filepath: str):
     except Exception as e:
         LOGERR(e)
 
+
 def format_json(resultset, single_record=False, field_filter=0):
     """Return results in JSON format.
 
@@ -4250,6 +4396,8 @@ def format_json(resultset, single_record=False, field_filter=0):
         Search results from DB query.
     single_record : bool, optional
         If True, indicates only one record. Default is False.
+    field_filter : int, optional
+        Indicates format for displaying bookmarks. Default is 0.
 
     Returns
     -------
@@ -4300,6 +4448,36 @@ def format_json(resultset, single_record=False, field_filter=0):
             marks.append(record)
 
     return json.dumps(marks, sort_keys=True, indent=4)
+
+
+def print_json_safe(resultset, single_record=False, field_filter=0):
+    """Prints json results and handles IOError
+
+    Parameters
+    ----------
+    resultset : list
+        Search results from DB query.
+    single_record : bool, optional
+        If True, indicates only one record. Default is False.
+    field_filter : int, optional
+        Indicates format for displaying bookmarks. Default is 0.
+
+    Returns
+    -------
+    None
+    """
+
+    try:
+        print(format_json(resultset, single_record, field_filter))
+    except IOError:
+        try:
+            sys.stdout.close()
+        except IOError:
+            pass
+        try:
+            sys.stderr.close()
+        except IOError:
+            pass
 
 
 def is_int(string):
@@ -4400,7 +4578,7 @@ def check_upstream_release():
     if MYPROXY is None:
         gen_headers()
 
-    ca_certs = os.getenv('BUKU_CA_CERTS', default=certifi.where())
+    ca_certs = os.getenv('BUKU_CA_CERTS', default=CA_CERTS)
     if MYPROXY:
         manager = urllib3.ProxyManager(
             MYPROXY,
@@ -4791,7 +4969,7 @@ def piped_input(argv, pipeargs=None):
     """
     if not sys.stdin.isatty():
         pipeargs += argv
-        print('waiting for input')
+        print('buku: waiting for input (unexpected? try --nostdin)')
         for s in sys.stdin:
             pipeargs += s.split()
 
@@ -4814,10 +4992,105 @@ def setcolors(args):
     result = [id_col, id_str_col, url_col, desc_col, tag_col]
     return result
 
+
+def unwrap(text):
+    """Unwrap text."""
+    lines = text.split('\n')
+    result = ''
+    for i in range(len(lines) - 1):
+        result += lines[i]
+        if not lines[i]:
+            # Paragraph break
+            result += '\n\n'
+        elif lines[i + 1]:
+            # Next line is not paragraph break, add space
+            result += ' '
+    # Handle last line
+    result += lines[-1] if lines[-1] else '\n'
+    return result
+
+
+def check_stdout_encoding():
+    """Make sure stdout encoding is utf-8.
+
+    If not, print error message and instructions, then exit with
+    status 1.
+
+    This function is a no-op on win32 because encoding on win32 is
+    messy, and let's just hope for the best. /s
+    """
+    if sys.platform == 'win32':
+        return
+
+    # Use codecs.lookup to resolve text encoding alias
+    encoding = codecs.lookup(sys.stdout.encoding).name
+    if encoding != 'utf-8':
+        locale_lang, locale_encoding = locale.getlocale()
+        if locale_lang is None:
+            locale_lang = '<unknown>'
+        if locale_encoding is None:
+            locale_encoding = '<unknown>'
+        ioencoding = os.getenv('PYTHONIOENCODING', 'not set')
+        sys.stderr.write(unwrap(textwrap.dedent("""\
+        stdout encoding '{encoding}' detected. ddgr requires utf-8 to
+        work properly. The wrong encoding may be due to a non-UTF-8
+        locale or an improper PYTHONIOENCODING. (For the record, your
+        locale language is {locale_lang} and locale encoding is
+        {locale_encoding}; your PYTHONIOENCODING is {ioencoding}.)
+
+        Please set a UTF-8 locale (e.g., en_US.UTF-8) or set
+        PYTHONIOENCODING to utf-8.
+        """.format(
+            encoding=encoding,
+            locale_lang=locale_lang,
+            locale_encoding=locale_encoding,
+            ioencoding=ioencoding,
+        ))))
+        sys.exit(1)
+
+
+def monkeypatch_textwrap_for_cjk():
+    """Monkeypatch textwrap for CJK wide characters.
+    """
+    try:
+        if textwrap.wrap.patched:
+            return
+    except AttributeError:
+        pass
+    psl_textwrap_wrap = textwrap.wrap
+
+    def textwrap_wrap(text, width=70, **kwargs):
+        width = max(width, 2)
+        # We first add a U+0000 after each East Asian Fullwidth or East
+        # Asian Wide character, then fill to width - 1 (so that if a NUL
+        # character ends up on a new line, we still have one last column
+        # to spare for the preceding wide character). Finally we strip
+        # all the NUL characters.
+        #
+        # East Asian Width: https://www.unicode.org/reports/tr11/
+        return [
+            line.replace('\0', '')
+            for line in psl_textwrap_wrap(
+                ''.join(
+                    ch + '\0' if unicodedata.east_asian_width(ch) in ('F', 'W') else ch
+                    for ch in unicodedata.normalize('NFC', text)
+                ),
+                width=width - 1,
+                **kwargs
+            )
+        ]
+
+    def textwrap_fill(text, width=70, **kwargs):
+        return '\n'.join(textwrap_wrap(text, width=width, **kwargs))
+    textwrap.wrap = textwrap_wrap
+    textwrap.fill = textwrap_fill
+    textwrap.wrap.patched = True
+    textwrap.fill.patched = True
+
 # main starts here
 def main():
     """Main."""
-    global ID_STR, ID_DB_STR, MUTE_STR, URL_STR, DESC_STR, TAG_STR, PROMPTMSG
+    global ID_STR, ID_DB_STR, MUTE_STR, URL_STR, DESC_STR, DESC_WRAP, TAG_STR, TAG_WRAP, PROMPTMSG
 
     title_in = None
     tags_in = None
@@ -4825,14 +5098,15 @@ def main():
     pipeargs = []
     colorstr_env = os.getenv('BUKU_COLORS')
 
-    try:
-        piped_input(sys.argv, pipeargs)
-    except KeyboardInterrupt:
-        pass
+    if len(sys.argv) >= 2 and sys.argv[1] != '--nostdin':
+        try:
+            piped_input(sys.argv, pipeargs)
+        except KeyboardInterrupt:
+            pass
 
-    # If piped input, set argument vector
-    if pipeargs:
-        sys.argv = pipeargs
+        # If piped input, set argument vector
+        if pipeargs:
+            sys.argv = pipeargs
 
     # Setup custom argument parser
     argparser = ExtendedArgumentParser(
@@ -4863,9 +5137,10 @@ POSITIONAL ARGUMENTS:
                          - update results when used with search
                          - otherwise refresh all titles and desc
     -w, --write [editor|index]
-                         open editor to edit a fresh bookmark
+                         edit and add a new bookmark in editor
+                         else, edit bookmark at index in EDITOR
                          edit last bookmark, if index=-1
-                         to specify index, EDITOR must be set
+                         if no args, edit new bookmark in EDITOR
     -d, --delete [...]   remove bookmarks from DB
                          accepts indices or a single range
                          if no arguments:
@@ -4985,6 +5260,7 @@ POSITIONAL ARGUMENTS:
     --cached index|URL   browse a cached page from Wayback Machine
     --suggest            show similar tags when adding bookmarks
     --tacit              reduce verbosity, skip some confirmations
+    --nostdin            do not wait for input (must be first arg)
     --threads N          max network connections in full refresh
                          default N=4, min N=1, max N=10
     -V                   check latest upstream version available
@@ -5008,6 +5284,7 @@ POSITIONAL ARGUMENTS:
     addarg('--cached', nargs=1, help=hide)
     addarg('--suggest', action='store_true', help=hide)
     addarg('--tacit', action='store_true', help=hide)
+    addarg('--nostdin', action='store_true', help=hide)
     addarg('--threads', type=int, default=4, choices=range(1, 11), help=hide)
     addarg('-V', dest='upstream', action='store_true', help=hide)
     addarg('-g', '--debug', action='store_true', help=hide)
@@ -5053,7 +5330,9 @@ POSITIONAL ARGUMENTS:
         MUTE_STR = '%s \x1b[2m(L)\x1b[0m\n'
         URL_STR = COLORMAP['j'] + '   > ' + setcolors(colorstr)[2] + '%s\n' + COLORMAP['x']
         DESC_STR = COLORMAP['j'] + '   + ' + setcolors(colorstr)[3] + '%s\n' + COLORMAP['x']
+        DESC_WRAP = COLORMAP['j'] + setcolors(colorstr)[3] + '%s%s' + COLORMAP['x']
         TAG_STR = COLORMAP['j'] + '   # ' + setcolors(colorstr)[4] + '%s\n' + COLORMAP['x']
+        TAG_WRAP = COLORMAP['j'] + setcolors(colorstr)[4] + '%s%s' + COLORMAP['x']
 
         # Enable color in logs
         setup_logger(LOGGER)
@@ -5071,7 +5350,7 @@ POSITIONAL ARGUMENTS:
     browse.override_text_browser = False
 
     # Fallback to prompt if no arguments
-    if len(sys.argv) == 1:
+    if len(sys.argv) <= 2 and (len(sys.argv) == 1 or (len(sys.argv) == 2 and args.nostdin)):
         bdb = BukuDb()
         prompt(bdb, None)
         bdb.close_quit(0)
@@ -5307,6 +5586,9 @@ POSITIONAL ARGUMENTS:
         except Exception:
             pass
 
+    check_stdout_encoding()
+    monkeypatch_textwrap_for_cjk()
+
     if search_results:
         oneshot = args.np
         update_search_results = False
@@ -5333,7 +5615,7 @@ POSITIONAL ARGUMENTS:
             write_string_to_file(format_json(search_results, field_filter=args.format), args.json)
         else:
             # Printing in JSON format is non-interactive
-            print(format_json(search_results, field_filter=args.format))
+            print_json_safe(search_results, field_filter=args.format)
 
         # Export the results, if opted
         if args.export is not None:

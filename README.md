@@ -16,11 +16,14 @@ hashtags.
 `scripts/load_db.sh`
 
 ### Howto patch buku
-install buku with pipx
+install twbm with pipx for local development: `pipx install ~/dev/py/twbm`
+uninstall: `pipx uninstall twbm`  # GOTCHA: NOT THE PATH !!!!
 
 ```bash
 rm buku
-wget https://raw.githubusercontent.com/jarun/buku/master/buku ~/dev/py/bookmark/bookmark
+wget https://raw.githubusercontent.com/jarun/buku/master/buku .
+
+# Update buku.py
 patch it: `# tw: add title tagging`
 ```
 
