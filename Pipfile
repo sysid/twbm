@@ -4,7 +4,6 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pathlib2 = "*"
 pytest = "*"
 codecov = "*"
 pytest-cov = "*"
@@ -16,10 +15,15 @@ mock = "*"
 # bookmarks-parser = "*"
 beautifulsoup4 = "*"
 html5lib = "*"
-bookmark = {editable = true,path = "."}
 typer = "*"
 ipython = "*"
 aiosql = "*"
+alembic = "*"
+sqlalchemy = "*"
+certifi = "*"
+cryptography = "*"
+urllib3 = "*"
+pydantic = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"

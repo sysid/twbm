@@ -1,7 +1,21 @@
 import logging
+import os
+import shutil
+from pathlib import Path
+
+from db.dal import DAL
+
+os.environ[
+    "RUN_ENV"
+] = "testing"  # Gotcha: make sure environment setup is before app is sourced
+
 import pytest
+from twbm.environment import config
 
 _log = logging.getLogger(__name__)
+log_fmt = r'%(asctime)-15s %(levelname)s %(name)s %(funcName)s:%(lineno)d %(message)s'
+datefmt = '%Y-%m-%d %H:%M:%S'
+logging.basicConfig(format=log_fmt, level=config.log_level, datefmt=datefmt)
 
 
 @pytest.fixture()
@@ -118,3 +132,17 @@ def data():
                    'date_modified': '0', 'id': '3',
                    'name': 'Mobile bookmarks',
                    'type': 'folder'}}, 'version': 1}
+
+
+@pytest.fixture()
+def init_db():
+    p = Path(__file__).parent / 'tests_data'
+    shutil.copy(p / 'bm_fts.db.bkp', p / 'bm_fts.db')
+    print(f"Copying test database")
+
+
+@pytest.fixture()
+def dal(init_db):
+    dal = DAL(env_config=config)
+    with dal as dal:
+        yield dal
