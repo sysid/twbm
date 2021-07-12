@@ -27,7 +27,7 @@
         </introspection-scope>
       </schema-mapping>
     </data-source>
-    <data-source name="bm.db test" uuid="36d32c64-8999-44a8-966e-312ab03af769">
+    <data-source name="bm_test.db" uuid="d71bf352-529d-481a-8c4d-49f1ca96f459">
       <database-info product="SQLite" version="3.34.0" jdbc-version="2.1" driver-name="SQLite JDBC" driver-version="3.34.0" dbms="SQLITE" exact-version="3.34.0" exact-driver-version="3.34">
         <identifier-quote-string>&quot;</identifier-quote-string>
       </database-info>

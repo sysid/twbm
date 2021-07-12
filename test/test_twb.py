@@ -1,0 +1,68 @@
+import os
+
+import pytest
+
+from twbm.twb import match_all_tags, match_any_tag, _update_tags
+
+os.environ[
+    "RUN_ENV"
+] = "testing"  # Gotcha: make sure environment setup is before app is sourced
+
+
+@pytest.mark.parametrize(
+    ('tags', 'bm_tags', 'result'),
+    (
+            (('a', 'b'), ('a', 'b', 'c', 'd'), True),
+            (('a', 'b'), ('b', 'c', 'd'), False),
+            (('a', 'b'), ('b', 'a'), True),
+            (('a', 'b'), ('a',), False),
+    )
+)
+def test_match_all_tags(tags, bm_tags, result):
+    # res = match_all_tags(('a', 'b'), ('a', 'b', 'c', 'd'))
+    assert match_all_tags(tags, bm_tags) is result
+
+
+@pytest.mark.parametrize(
+    ('tags', 'bm_tags', 'result'),
+    (
+            (('a', 'b'), ('a', 'b', 'c', 'd'), True),
+            (('a', 'b', 'x'), ('a', 'b', 'c', 'd'), True),
+            (('a', 'b', 'x'), ('a',), True),
+            (('a', 'b'), ('x', 'y'), False),
+    )
+)
+def test_match_any_tag(tags, bm_tags, result):
+    # res = match_all_tags(('a', 'b'), ('a', 'b', 'c', 'd'))
+    assert match_any_tag(tags, bm_tags) is result
+
+
+def test_match_all(dal):
+    bms = dal.get_bookmarks(fts_query="security")
+    tags = ('web', 'ob')
+    # filtered = [bm for bm in bms if 'web' in bm.tags.split(',')]
+    filtered = [bm for bm in bms if match_all_tags(tags, bm.split_tags)]
+    assert len(filtered) == 5
+
+
+def test_match_any(dal):
+    bms = dal.get_bookmarks(fts_query="security")
+    tags = ('web', 'ob')
+    # filtered = [bm for bm in bms if 'web' in bm.tags.split(',')]
+    filtered = [bm for bm in bms if match_any_tag(tags, bm.split_tags)]
+    assert len(filtered) == 25
+
+
+@pytest.mark.parametrize(
+    ('ids', 'tags', 'tags_not', 'force', 'result'),
+    (
+            ((1,), ('x',), ('ob',), False, ',knowhow,sec,x,'),
+            ((1,), ('x',), None, True, ',x,'),
+            ((1,), None, None, False, ',knowhow,ob,sec,'),
+            ((1,), None, ('knowhow', 'ob', 'sec'), False, ',,'),
+    )
+)
+def test_update(dal, ids, tags, tags_not, result, force):
+    # _update_tags((0,), ('x',), ('ob',))
+    _update_tags(ids, tags, tags_not, force=force)
+    assert dal.get_bookmarks(fts_query="xxxxx")[0].tags == result

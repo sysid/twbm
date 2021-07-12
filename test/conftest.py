@@ -1,7 +1,10 @@
 import logging
 import os
-import shutil
 from pathlib import Path
+
+import aiosql
+from alembic import command
+from alembic.config import Config
 
 from db.dal import DAL
 
@@ -134,15 +137,33 @@ def data():
                    'type': 'folder'}}, 'version': 1}
 
 
+# @pytest.fixture()
+# def init_db():
+#     p = Path(__file__).parent / 'tests_data'
+#     shutil.copy(p / 'bm_fts.db.bkp', p / 'bm_fts.db')
+#     print(f"Copying test database")
+
+
 @pytest.fixture()
 def init_db():
-    p = Path(__file__).parent / 'tests_data'
-    shutil.copy(p / 'bm_fts.db.bkp', p / 'bm_fts.db')
-    print(f"Copying test database")
+    dsn = 'sqlite:///test/tests_data/bm_test.db'
+    (Path(__file__).parent / 'tests_data/bm_test.db').unlink(missing_ok=True)
+    alembic_root = Path(__file__).parent.parent / 'db'
+
+    alembic_cfg = Config(alembic_root / 'alembic.ini')
+    alembic_cfg.set_main_option('script_location', str(alembic_root / 'alembic'))
+    alembic_cfg.set_main_option('sqlalchemy.url', dsn)
+
+    command.upgrade(alembic_cfg, 'head')
+    _ = None
 
 
 @pytest.fixture()
 def dal(init_db):
     dal = DAL(env_config=config)
     with dal as dal:
+        sql_files_path = Path(__file__).parent.absolute() / "sql"
+        aiosql_queries = aiosql.from_path(f"{sql_files_path}", "sqlite3")
+        aiosql_queries.load_testdata(dal.conn.connection)
+        dal.conn.connection.commit()
         yield dal

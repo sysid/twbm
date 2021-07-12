@@ -15,11 +15,11 @@
       <jdbc-url>jdbc:sqlite:$USER_HOME$/vimwiki/buku/bm.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="bm.db test" uuid="36d32c64-8999-44a8-966e-312ab03af769">
+    <data-source source="LOCAL" name="bm_test.db" uuid="d71bf352-529d-481a-8c4d-49f1ca96f459">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/test/tests_data/bm.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/test/tests_data/bm_test.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
