@@ -26,7 +26,7 @@ def test_xxx(dal):
 # noinspection PyTypeChecker,PyUnresolvedReferences
 # @pytest.mark.skip("get real data")
 def test_get_bookmarks(dal):
-    results = dal.get_bookmarks(fts_query="security")
+    results = dal.get_bookmarks(fts_query="aaa")
     # for result in results:
     #     print(f"{result.use_case}, {result.reason}, {result.strategy}")
     assert len(results) > 0
@@ -34,46 +34,45 @@ def test_get_bookmarks(dal):
 
 
 def test_get_bookmarks_via_fts(dal):
-    bms = dal.get_bookmarks(fts_query="security")
-    assert len(bms) == 36
+    bms = dal.get_bookmarks(fts_query="aaa")
+    assert len(bms) == 1
 
 
 def test_get_bookmarks_raw(dal):
     bms = dal.get_bookmarks(fts_query="")
-    assert len(bms) >= 1000
+    assert len(bms) >= 5
 
 
 def test_get_xxxxx(dal):
     # this is the testing entry in bm.db
     bms = dal.get_bookmarks(fts_query="xxxxx")
     assert len(bms) == 1
-    assert bms[0].tags == ',knowhow,ob,sec,'
+    assert bms[0].tags == ',ccc,xxx,yyy,'
 
 
 def test_update_bm(dal):
     bm = dal.get_bookmarks(fts_query="xxxxx")[0]
-    assert bm.tags == ',knowhow,ob,sec,'
+    assert bm.tags == ',ccc,xxx,yyy,'
 
-    bm.tags = ',xxx,'
+    bm.tags = ',bla,'
     result = dal.update_bookmark(bm)
 
-    assert dal.get_bookmarks(fts_query="xxxxx")[0].tags == ',xxx,'
+    assert dal.get_bookmarks(fts_query="xxxxx")[0].tags == ',bla,'
 
 
 def test_insert_bm(dal):
     bm = Bookmark(
-        URL="http://aaaaa/bbbbb",
+        URL="http://ccccc/ccccc",
         metadata="metadata",
-        tags=",aaa,bbb,",
+        tags=",aaa,bbb,ccc,",
         desc="description",
         flags=0,
     )
     result = dal.insert_bookmark(bm)
 
-    assert dal.get_bookmarks(fts_query="aaaaa")[0].tags == ',aaa,bbb,'
+    assert dal.get_bookmarks(fts_query="ccccc")[0].tags == ',aaa,bbb,ccc,'
 
 
-# TODO: not working
 def test_delete_bm(dal):
     result = dal.delete_bookmark(id_=1)
     print(result)
@@ -93,7 +92,15 @@ def test_split_tags(dal):
     assert '' not in tags
 
 
-def test_get_related_tags(dal):
-    tags = dal.get_related_tags(tag='py')
+@pytest.mark.parametrize(
+    ('tag', 'result'),
+    (
+            ('ccc', ['aaa', 'bbb', 'ccc', 'xxx', 'yyy']),
+    )
+)
+def test_get_related_tags(dal, tag, result):
+    tags = dal.get_related_tags(tag=tag)
     print(tags)
+    assert tags == result
+    assert len(tags) >= len(result)
     _ = None

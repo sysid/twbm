@@ -38,28 +38,28 @@ def test_match_any_tag(tags, bm_tags, result):
 
 
 def test_match_all(dal):
-    bms = dal.get_bookmarks(fts_query="security")
-    tags = ('web', 'ob')
+    bms = dal.get_bookmarks(fts_query="")
+    tags = ('aaa', 'ccc')
     # filtered = [bm for bm in bms if 'web' in bm.tags.split(',')]
     filtered = [bm for bm in bms if match_all_tags(tags, bm.split_tags)]
-    assert len(filtered) == 5
+    assert len(filtered) >= 1
 
 
 def test_match_any(dal):
-    bms = dal.get_bookmarks(fts_query="security")
-    tags = ('web', 'ob')
+    bms = dal.get_bookmarks(fts_query="")
+    tags = ('aaa', 'xxx')
     # filtered = [bm for bm in bms if 'web' in bm.tags.split(',')]
     filtered = [bm for bm in bms if match_any_tag(tags, bm.split_tags)]
-    assert len(filtered) == 25
+    assert len(filtered) >= 4
 
 
 @pytest.mark.parametrize(
     ('ids', 'tags', 'tags_not', 'force', 'result'),
     (
-            ((1,), ('x',), ('ob',), False, ',knowhow,sec,x,'),
+            ((1,), ('x',), ('ccc',), False, ',x,xxx,yyy,'),
             ((1,), ('x',), None, True, ',x,'),
-            ((1,), None, None, False, ',knowhow,ob,sec,'),
-            ((1,), None, ('knowhow', 'ob', 'sec'), False, ',,'),
+            ((1,), None, None, False, ',ccc,xxx,yyy,'),
+            ((1,), None, ('ccc', 'xxx', 'yyy'), False, ',,'),
     )
 )
 def test_update(dal, ids, tags, tags_not, result, force):

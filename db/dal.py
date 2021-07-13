@@ -146,14 +146,15 @@ class DAL:
         return sql_result
 
     def get_related_tags(self, tag: str):
-        # Example query
+        tag_query = f"%,{tag},%"
         # noinspection SqlResolve
         query = """
             -- name: get_related_tags
             with RECURSIVE split(tags, rest) AS (
                 SELECT '', tags || ','
                 FROM bookmarks
-                WHERE tags LIKE '%,sec,%'
+                WHERE tags LIKE :tag_query
+                -- WHERE tags LIKE '%,ccc,%'
                 UNION ALL
                 SELECT substr(rest, 0, instr(rest, ',')),
                        substr(rest, instr(rest, ',') + 1)
@@ -165,10 +166,10 @@ class DAL:
             ORDER BY tags;
         """
         queries = aiosql.from_str(query, "sqlite3")
-        sql_result = queries.get_related_tags(self.conn.connection, tag='%,knowhow,%')
+        sql_result = queries.get_related_tags(self.conn.connection, tag_query=tag_query)
 
         # if not sql_result:
         #     # noinspection PyRedundantParentheses
         #     return (Bookmark(),)
-        return sql_result
+        return [tags[0] for tags in sql_result]
 
