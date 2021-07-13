@@ -6,7 +6,7 @@ import aiosql
 from alembic import command
 from alembic.config import Config
 
-from db.dal import DAL
+from twbm.db.dal import DAL
 
 os.environ[
     "RUN_ENV"
@@ -148,7 +148,7 @@ def data():
 def init_db():
     dsn = 'sqlite:///test/tests_data/bm_test.db'
     (Path(__file__).parent / 'tests_data/bm_test.db').unlink(missing_ok=True)
-    alembic_root = Path(__file__).parent.parent / 'db'
+    alembic_root = Path(__file__).parent.parent / 'twbm/db'
 
     alembic_cfg = Config(alembic_root / 'alembic.ini')
     alembic_cfg.set_main_option('script_location', str(alembic_root / 'alembic'))

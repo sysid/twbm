@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine, Connection
 
-from twbm.environment import Environment
+# from twbm.environment import Environment
 
 _log = logging.getLogger(__name__)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
@@ -50,7 +50,7 @@ class DAL:
 
     is_simulated_environment: bool
 
-    def __init__(self, env_config: Environment):
+    def __init__(self, env_config: "Environment"):
         self.bm_db_url = env_config.bm_db_url
         self.record_classes = {
             "Bookmark": Bookmark,

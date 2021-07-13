@@ -1,3 +1,4 @@
+import logging
 import sys
 import webbrowser
 from os import isatty
@@ -5,10 +6,7 @@ from typing import Sequence
 
 import typer
 
-from db.dal import DAL, Bookmark
-
-import logging
-
+from twbm.db.dal import Bookmark, DAL
 from twbm.environment import config
 
 _log = logging.getLogger(__name__)

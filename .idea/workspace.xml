@@ -5,13 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ef55b783-b733-4562-aedf-bd6107674c99" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/test/tests_data/bm_test.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.envrc" beforeDir="false" afterPath="$PROJECT_DIR$/.envrc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/dal.py" beforeDir="false" afterPath="$PROJECT_DIR$/db/dal.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sql/queries.sql" beforeDir="false" afterPath="$PROJECT_DIR$/sql/queries.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/db/test_dal.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/db/test_dal.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/sql/load_testdata.sql" beforeDir="false" afterPath="$PROJECT_DIR$/test/sql/load_testdata.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/test_twb.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_twb.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/alembic.ini" beforeDir="false" afterPath="$PROJECT_DIR$/twbm/db/alembic.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/alembic/README" beforeDir="false" afterPath="$PROJECT_DIR$/twbm/db/alembic/README" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/alembic/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/twbm/db/alembic/env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/alembic/script.py.mako" beforeDir="false" afterPath="$PROJECT_DIR$/twbm/db/alembic/script.py.mako" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/alembic/versions/7c2eff0bf291_create_all.py" beforeDir="false" afterPath="$PROJECT_DIR$/twbm/db/alembic/versions/7c2eff0bf291_create_all.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/dal.py" beforeDir="false" afterPath="$PROJECT_DIR$/twbm/db/dal.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/initdb.sh" beforeDir="false" afterPath="$PROJECT_DIR$/twbm/db/initdb.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/conftest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/tests_data/bm_test.db" beforeDir="false" afterPath="$PROJECT_DIR$/test/tests_data/bm_test.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/twbm/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/twbm/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/twbm/twb.py" beforeDir="false" afterPath="$PROJECT_DIR$/twbm/twb.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +37,7 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/db/dal.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/twbm/db/dal.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/test/conftest.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/setup.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/test/db/test_dal.py" root0="FORCE_HIGHLIGHTING" />
@@ -43,7 +50,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/consoles/db/c26405c0-c7a2-4609-a8d4-f07a1155ec17/console.sql" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/twbm/twb.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/test/sql/load_testdata.sql" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/db/alembic/versions/7c2eff0bf291_create_all.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/twbm/db/alembic/versions/7c2eff0bf291_create_all.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/scratches/scratchpad.sql" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="KubernetesApiPersistence">
@@ -71,10 +78,12 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/twbm/" />
+      <recent name="$PROJECT_DIR$/" />
       <recent name="$PROJECT_DIR$/test/sql" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.pytest for test_dal.test_get_related_tags">
+  <component name="RunManager" selected="Python tests.pytest in test_twb.py">
     <configuration name="pytest for test_dal.test_get_related_tags" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
       <module name="twbm" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -102,66 +111,6 @@
       <option name="_new_parameters" value="&quot;&quot;" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
       <option name="_new_target" value="&quot;test_dal.test_get_related_tags&quot;" />
-      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
-      <method v="2" />
-    </configuration>
-    <configuration name="pytest for test_dal.test_get_xxxxx" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
-      <module name="twbm" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="RUN_ENV" value="testing" />
-      </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/.local/share/virtualenvs/twbm-EkDoN0UU/bin/python" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <EXTENSION ID="net.ashald.envfile">
-        <option name="IS_ENABLED" value="true" />
-        <option name="IS_SUBST" value="true" />
-        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
-        <option name="IS_IGNORE_MISSING_FILES" value="false" />
-        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
-        <ENTRIES>
-          <ENTRY IS_ENABLED="true" PARSER="runconfig" />
-        </ENTRIES>
-      </EXTENSION>
-      <option name="_new_keywords" value="&quot;&quot;" />
-      <option name="_new_parameters" value="&quot;&quot;" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;test_dal.test_get_xxxxx&quot;" />
-      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
-      <method v="2" />
-    </configuration>
-    <configuration name="pytest for test_dal.test_insert_bm" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
-      <module name="twbm" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="RUN_ENV" value="testing" />
-      </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/.local/share/virtualenvs/twbm-EkDoN0UU/bin/python" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <EXTENSION ID="net.ashald.envfile">
-        <option name="IS_ENABLED" value="true" />
-        <option name="IS_SUBST" value="true" />
-        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
-        <option name="IS_IGNORE_MISSING_FILES" value="false" />
-        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
-        <ENTRIES>
-          <ENTRY IS_ENABLED="true" PARSER="runconfig" />
-        </ENTRIES>
-      </EXTENSION>
-      <option name="_new_keywords" value="&quot;&quot;" />
-      <option name="_new_parameters" value="&quot;&quot;" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;test_dal.test_insert_bm&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
@@ -225,21 +174,81 @@
       <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method v="2" />
     </configuration>
+    <configuration name="pytest in test_twb.py" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="twbm" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="RUN_ENV" value="testing" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/.local/share/virtualenvs/twbm-EkDoN0UU/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <EXTENSION ID="net.ashald.envfile">
+        <option name="IS_ENABLED" value="true" />
+        <option name="IS_SUBST" value="true" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" />
+        </ENTRIES>
+      </EXTENSION>
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/test/test_twb.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest in test_twbm.py" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="twbm" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="RUN_ENV" value="testing" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/.local/share/virtualenvs/twbm-EkDoN0UU/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <EXTENSION ID="net.ashald.envfile">
+        <option name="IS_ENABLED" value="true" />
+        <option name="IS_SUBST" value="true" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" />
+        </ENTRIES>
+      </EXTENSION>
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/test/test_twbm.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Database Script.queries.sql" />
-      <item itemvalue="Python tests.pytest for test_dal.test_insert_bm" />
       <item itemvalue="Python tests.pytest in test_dal.py" />
-      <item itemvalue="Python tests.pytest for test_dal.test_get_xxxxx" />
       <item itemvalue="Python tests.pytest for test_dal.test_update_bm" />
       <item itemvalue="Python tests.pytest for test_dal.test_get_related_tags" />
+      <item itemvalue="Python tests.pytest in test_twbm.py" />
+      <item itemvalue="Python tests.pytest in test_twb.py" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.pytest in test_twb.py" />
+        <item itemvalue="Python tests.pytest in test_twbm.py" />
         <item itemvalue="Python tests.pytest for test_dal.test_get_related_tags" />
         <item itemvalue="Python tests.pytest in test_dal.py" />
         <item itemvalue="Python tests.pytest for test_dal.test_update_bm" />
-        <item itemvalue="Python tests.pytest for test_dal.test_get_xxxxx" />
-        <item itemvalue="Python tests.pytest for test_dal.test_insert_bm" />
       </list>
     </recent_temporary>
   </component>
@@ -260,7 +269,8 @@
       <workItem from="1625991634848" duration="2651000" />
       <workItem from="1626116241791" duration="5636000" />
       <workItem from="1626122001310" duration="429000" />
-      <workItem from="1626153721478" duration="2890000" />
+      <workItem from="1626153721478" duration="3344000" />
+      <workItem from="1626189646073" duration="1673000" />
     </task>
     <servers />
   </component>
@@ -297,15 +307,15 @@
     <SUITE FILE_PATH="coverage/twbm$pytest_for_test_dal_test_update_bm.coverage" NAME="pytest for test_dal.test_update_bm Coverage Results" MODIFIED="1626156195901" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/twbm$pytest_for_test_dal_test_get_bookmarks_raw.coverage" NAME="pytest for test_dal.test_get_bookmarks_raw Coverage Results" MODIFIED="1626154084506" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/twbm$pytest_for_test_twb_test_match_all_tags.coverage" NAME="pytest for test_twb.test_match_all_tags Coverage Results" MODIFIED="1626154383156" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/twbm$pytest_for_test_dal_test_get_related_tags.coverage" NAME="pytest for test_dal.test_get_related_tags Coverage Results" MODIFIED="1626156605657" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/twbm$pytest_in_test_twb_py.coverage" NAME="pytest in test_twb.py Coverage Results" MODIFIED="1626154951352" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/twbm$pytest_for_test_dal_test_get_related_tags.coverage" NAME="pytest for test_dal.test_get_related_tags Coverage Results" MODIFIED="1626156870226" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/twbm$pytest_for_test_dal_test_get_xxxxx.coverage" NAME="pytest for test_dal.test_get_xxxxx Coverage Results" MODIFIED="1626156162890" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/twbm$pytest_in_test_twb_py.coverage" NAME="pytest in test_twb.py Coverage Results" MODIFIED="1626192017510" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/twbm$pytest_in_test.coverage" NAME="pytest in test Coverage Results" MODIFIED="1625991640491" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
     <SUITE FILE_PATH="coverage/twbm$pytest_for_test_twb_test_match_all.coverage" NAME="pytest for test_twb.test_match_all Coverage Results" MODIFIED="1626154709644" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/twbm$sql.coverage" NAME="sql Coverage Results" MODIFIED="1610300062502" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/twbm" />
     <SUITE FILE_PATH="coverage/twbm$pytest_for_test_twb_test_update.coverage" NAME="pytest for test_twb.test_update Coverage Results" MODIFIED="1626154945594" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/twbm$pytest_in_test_twbm_py.coverage" NAME="pytest in test_twbm.py Coverage Results" MODIFIED="1626116707529" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
     <SUITE FILE_PATH="coverage/twbm$pytest_in_test_dal_py.coverage" NAME="pytest in test_dal.py Coverage Results" MODIFIED="1626156200957" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/twbm$pytest_in_test_twbm_py.coverage" NAME="pytest in test_twbm.py Coverage Results" MODIFIED="1626191866379" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/twbm$buku.coverage" NAME="buku Coverage Results" MODIFIED="1610205402074" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/twbm" />
     <SUITE FILE_PATH="coverage/twbm$pytest_for_test_buku_test_load_chrome_database_mock.coverage" NAME="pytest for test_buku.test_load_chrome_database_mock Coverage Results" MODIFIED="1610203655678" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
     <SUITE FILE_PATH="coverage/twbm$pytest_in_test_load_db_py.coverage" NAME="pytest in test_load_db.py Coverage Results" MODIFIED="1610297694104" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
