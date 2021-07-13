@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ef55b783-b733-4562-aedf-bd6107674c99" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/db/test_dal.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/db/test_dal.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/twbm/db/dal.py" beforeDir="false" afterPath="$PROJECT_DIR$/twbm/db/dal.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/twbm/environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/twbm/environment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/twbm/twb.py" beforeDir="false" afterPath="$PROJECT_DIR$/twbm/twb.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/local_install.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.testing" beforeDir="false" afterPath="$PROJECT_DIR$/.env.testing" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -207,7 +202,7 @@
       <workItem from="1626116241791" duration="5636000" />
       <workItem from="1626122001310" duration="429000" />
       <workItem from="1626153721478" duration="3344000" />
-      <workItem from="1626189646073" duration="4007000" />
+      <workItem from="1626189646073" duration="4417000" />
     </task>
     <servers />
   </component>
@@ -262,6 +257,7 @@
     <SUITE FILE_PATH="coverage/twbm$pytest_for_test_dal_test_delete_bm.coverage" NAME="pytest for test_dal.test_delete_bm Coverage Results" MODIFIED="1626154268751" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/twbm$pytest_for_test_twb_test_match_any.coverage" NAME="pytest for test_twb.test_match_any Coverage Results" MODIFIED="1626154743589" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/twbm$pytest_for_test_dal_test_get_bookmarks_via_fts.coverage" NAME="pytest for test_dal.test_get_bookmarks_via_fts Coverage Results" MODIFIED="1626153880600" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/twbm$twb_search.coverage" NAME="twb search Coverage Results" MODIFIED="1626194776016" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/twbm$pytest_in_test_buku_py.coverage" NAME="pytest in test_buku.py Coverage Results" MODIFIED="1610196098590" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/twbm$pytest_for_test_dal_test_get_bookmarks.coverage" NAME="pytest for test_dal.test_get_bookmarks Coverage Results" MODIFIED="1626153871687" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/twbm$pytest_for_test_dal_test_split_tags.coverage" NAME="pytest for test_dal.test_split_tags Coverage Results" MODIFIED="1626154282454" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

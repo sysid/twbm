@@ -2,6 +2,11 @@
 
 Fork of https://github.com/jarun/buku.
 
+## Configuration
+```bash
+TWBM_DB_URL=sqlite:////$HOME/vimwiki/buku/bm.db bb search
+```
+
 ## Reason
 I do not need bukuserver.
 I need to have some additional functionality in buku, e.g. alphabetical ordering, ...
