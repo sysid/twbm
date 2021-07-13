@@ -11,7 +11,7 @@ from sqlalchemy.engine import Engine, Connection
 # from twbm.environment import Environment
 
 _log = logging.getLogger(__name__)
-logging.getLogger('sqlalchemy.engine').setLevel(logging.DEBUG)
+logging.getLogger("sqlalchemy.engine").setLevel(logging.DEBUG)
 # logging.getLogger('sqlalchemy').setLevel(logging.DEBUG)
 
 metadata = sa.MetaData()
@@ -21,26 +21,28 @@ sim_results_table = sa.Table(
     metadata,
     sa.Column("id", sa.Integer, primary_key=True),
     sa.Column("URL", sa.String(), nullable=False, unique=True),
-    sa.Column("metadata", sa.String(), default=''),
-    sa.Column("tags", sa.String(), default=''),
-    sa.Column("desc", sa.String(), default=''),
+    sa.Column("metadata", sa.String(), default=""),
+    sa.Column("tags", sa.String(), default=""),
+    sa.Column("desc", sa.String(), default=""),
     sa.Column("flags", sa.Integer(), default=0),
-    sa.Column("last_update_ts", sa.DateTime(), server_default=sa.func.current_timestamp()),
+    sa.Column(
+        "last_update_ts", sa.DateTime(), server_default=sa.func.current_timestamp()
+    ),
 )
 
 
 class Bookmark(BaseModel):
     id: int = None
-    URL: str = ''
-    metadata: str = ''
-    tags: str = ',,'
-    desc: str = ''
+    URL: str = ""
+    metadata: str = ""
+    tags: str = ",,"
+    desc: str = ""
     flags: int = 0
     last_update_ts: datetime = datetime.utcnow()
 
     @property
     def split_tags(self) -> Sequence[str]:
-        return [tag for tag in self.tags.split(',') if tag != '']
+        return [tag for tag in self.tags.split(",") if tag != ""]
 
 
 # noinspection PyPropertyAccess
@@ -64,9 +66,7 @@ class DAL:
         # self.aiosql_queries = aiosql.from_path(f"{sql_files_path}", "sqlite3")
 
     def __enter__(self):
-        self._sql_alchemy_db_engine: Engine = create_engine(
-            self.bm_db_url
-        )
+        self._sql_alchemy_db_engine: Engine = create_engine(self.bm_db_url)
         self._conn = self._sql_alchemy_db_engine.connect()
         return self
 
@@ -97,8 +97,14 @@ class DAL:
             values (:URL, :metadata, :tags, :desc, :flags);
         """
         queries = aiosql.from_str(query, "sqlite3", record_classes=self.record_classes)
-        result = queries.insert_bookmark(self.conn.connection, URL=bm.URL, metadata=bm.metadata, tags=bm.tags,
-                                         desc=bm.desc, flags=bm.flags)
+        result = queries.insert_bookmark(
+            self.conn.connection,
+            URL=bm.URL,
+            metadata=bm.metadata,
+            tags=bm.tags,
+            desc=bm.desc,
+            flags=bm.flags,
+        )
         self.conn.connection.commit()
         return result
 
@@ -127,8 +133,12 @@ class DAL:
                 where bookmarks_fts match :fts_query
                 order by rank;
             """
-            queries = aiosql.from_str(query, "sqlite3", record_classes=self.record_classes)
-            sql_result = queries.get_bookmarks(self.conn.connection, fts_query=fts_query)
+            queries = aiosql.from_str(
+                query, "sqlite3", record_classes=self.record_classes
+            )
+            sql_result = queries.get_bookmarks(
+                self.conn.connection, fts_query=fts_query
+            )
         else:  # TODO: make normal query
             query = """
                 -- name: get_bookmarks
@@ -137,8 +147,12 @@ class DAL:
                 from bookmarks_fts
                 order by rank;
             """
-            queries = aiosql.from_str(query, "sqlite3", record_classes=self.record_classes)
-            sql_result = queries.get_bookmarks(self.conn.connection, fts_query=fts_query)
+            queries = aiosql.from_str(
+                query, "sqlite3", record_classes=self.record_classes
+            )
+            sql_result = queries.get_bookmarks(
+                self.conn.connection, fts_query=fts_query
+            )
 
         if not sql_result:
             # noinspection PyRedundantParentheses
@@ -172,4 +186,3 @@ class DAL:
         #     # noinspection PyRedundantParentheses
         #     return (Bookmark(),)
         return [tags[0] for tags in sql_result]
-

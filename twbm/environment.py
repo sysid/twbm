@@ -28,10 +28,10 @@ class Environment(BaseSettings):
     bm_db_url: str = "sqlite://db/bm.db"
 
     def __init__(
-            self,
-            _env_file: Union[Path, str, None] = env_file_sentinel,
-            _env_file_encoding: Optional[str] = None,
-            **values: Any,
+        self,
+        _env_file: Union[Path, str, None] = env_file_sentinel,
+        _env_file_encoding: Optional[str] = None,
+        **values: Any,
     ):
         super().__init__(
             _env_file=_env_file, _env_file_encoding=_env_file_encoding, **values

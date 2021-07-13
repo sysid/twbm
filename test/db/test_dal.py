@@ -47,17 +47,17 @@ def test_get_xxxxx(dal):
     # this is the testing entry in bm.db
     bms = dal.get_bookmarks(fts_query="xxxxx")
     assert len(bms) == 1
-    assert bms[0].tags == ',ccc,xxx,yyy,'
+    assert bms[0].tags == ",ccc,xxx,yyy,"
 
 
 def test_update_bm(dal):
     bm = dal.get_bookmarks(fts_query="xxxxx")[0]
-    assert bm.tags == ',ccc,xxx,yyy,'
+    assert bm.tags == ",ccc,xxx,yyy,"
 
-    bm.tags = ',bla,'
+    bm.tags = ",bla,"
     result = dal.update_bookmark(bm)
 
-    assert dal.get_bookmarks(fts_query="xxxxx")[0].tags == ',bla,'
+    assert dal.get_bookmarks(fts_query="xxxxx")[0].tags == ",bla,"
 
 
 def test_insert_bm(dal):
@@ -70,7 +70,7 @@ def test_insert_bm(dal):
     )
     result = dal.insert_bookmark(bm)
 
-    assert dal.get_bookmarks(fts_query="ccccc")[0].tags == ',aaa,bbb,ccc,'
+    assert dal.get_bookmarks(fts_query="ccccc")[0].tags == ",aaa,bbb,ccc,"
 
 
 def test_delete_bm(dal):
@@ -89,14 +89,11 @@ def test_split_tags(dal):
         flags=0,
     )
     tags = bm.split_tags
-    assert '' not in tags
+    assert "" not in tags
 
 
 @pytest.mark.parametrize(
-    ('tag', 'result'),
-    (
-            ('ccc', ['aaa', 'bbb', 'ccc', 'xxx', 'yyy']),
-    )
+    ("tag", "result"), (("ccc", ["aaa", "bbb", "ccc", "xxx", "yyy"]),)
 )
 def test_get_related_tags(dal, tag, result):
     tags = dal.get_related_tags(tag=tag)
