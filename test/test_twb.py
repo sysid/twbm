@@ -2,11 +2,11 @@ import os
 
 import pytest
 
-from twbm.twb import match_all_tags, match_any_tag, _update_tags
-
 os.environ[
     "RUN_ENV"
 ] = "testing"  # Gotcha: make sure environment setup is before app is sourced
+
+from twbm.twb import match_all_tags, match_any_tag, _update_tags, parse_tags
 
 
 @pytest.mark.parametrize(
@@ -66,3 +66,15 @@ def test_update(dal, ids, tags, tags_not, result, force):
     # _update_tags((0,), ('x',), ('ob',))
     _update_tags(ids, tags, tags_not, force=force)
     assert dal.get_bookmarks(fts_query="xxxxx")[0].tags == result
+
+
+@pytest.mark.parametrize(
+    ("tags", "result"),
+    (
+        (("tag1", "tag2"), ",tag1,tag2,"),
+        (("tag2", "tag1"), ",tag1,tag2,"),
+        ((), ",,"),
+    ),
+)
+def test_parse_tags(tags, result):
+    assert parse_tags(tags) == result

@@ -2,6 +2,7 @@ import os
 
 import pytest
 
+from twbm import buku
 from twbm.db.dal import DAL, metadata, Bookmark
 
 os.environ[
@@ -102,3 +103,9 @@ def test_get_related_tags(dal, tag, result):
     assert tags == result
     assert len(tags) >= len(result)
     _ = None
+
+
+def test_bukudb():
+    db = buku.BukuDb(dbfile=config.dbfile)  # single record database
+    db.add_rec("https://example.com")
+    # db.delete_rec(1)

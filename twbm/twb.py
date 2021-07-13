@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 import webbrowser
 from os import isatty
@@ -6,6 +7,7 @@ from typing import Sequence
 
 import typer
 
+from twbm.buku import edit_rec, network_handler
 from twbm.db.dal import Bookmark, DAL
 from twbm.environment import config
 
@@ -13,6 +15,7 @@ _log = logging.getLogger(__name__)
 log_fmt = r"%(asctime)-15s %(levelname)s %(name)s %(funcName)s:%(lineno)d %(message)s"
 datefmt = "%Y-%m-%d %H:%M:%S"
 logging.basicConfig(format=log_fmt, level=config.log_level, datefmt=datefmt)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 app = typer.Typer()
 
@@ -20,6 +23,11 @@ fts_sql = """
 -- name: fts
 -- record_class: Bookmark
 """
+
+
+def parse_tags(tags: Sequence[str]) -> str:
+    tags = sorted(set((tag.lower().strip() for tag in tags)))
+    return f",{','.join(tags)},"
 
 
 def match_all_tags(tags: Sequence, bm_tags: Sequence) -> bool:
@@ -236,6 +244,104 @@ def update(
         raise typer.Abort()
 
     _update_tags(ids, tags_, tags_not_, force=force)
+
+
+@app.command()
+def update(
+    # ctx: typer.Context,
+    input_: str = typer.Argument(None, help="tags, comma seperated list, no blanks"),
+    tags: str = typer.Option("", "-t", "--tags", help="add taglist to tags"),
+    tags_not: str = typer.Option("", "-n", "--tags", help="remove taglist from tags"),
+    force: bool = typer.Option(
+        False, "-f", "--force", help="overwrite tags with taglist"
+    ),
+    verbose: bool = typer.Option(False, "-v", "--verbose"),
+):
+    if verbose:
+        typer.echo(f"Using DB: {config.twbm_db_url}")
+    tags_ = tags.lower().replace(" ", "").split(",")
+    tags_not_ = tags_not.lower().replace(" ", "").split(",")
+
+    # Gotcha: running from IDE looks like pipe
+    is_pipe = not isatty(sys.stdin.fileno())
+    ids: Sequence[int] = list()
+
+    if is_pipe:
+        input_ = sys.stdin.readline()
+
+    try:
+        ids = [int(x) for x in input_.split()]
+    except ValueError as e:
+        typer.secho(f"-E- Wrong input format.", color=typer.colors.RED)
+        raise typer.Abort()
+
+    _update_tags(ids, tags_, tags_not_, force=force)
+
+
+@app.command()
+def add(
+    # ctx: typer.Context,
+    url: str = typer.Argument(None, help="URL"),
+    tags: str = typer.Option("", "-t", help="add taglist to tags"),
+    title: str = typer.Option("", "--title"),
+    desc: str = typer.Option("", "-d", "--desc"),
+    add: bool = typer.Option(False, "-a", "--add", help="non-interactive"),
+    verbose: bool = typer.Option(False, "-v", "--verbose"),
+    nofetch: bool = typer.Option(
+        False, "-f", "--nofetch", help="do not try to fetch metadata from web"
+    ),
+):
+    if verbose:
+        typer.echo(f"Using DB: {config.twbm_db_url}")
+    tags_ = tags.lower().replace(" ", "").split(",")
+    tags_in = parse_tags(tags_)
+
+    if not add:
+        editor = os.environ.get("EDITOR", None)
+        if editor is None:
+            typer.secho(
+                f"Editor not set, please set environment variable EDITOR",
+                color=typer.colors.RED,
+            )
+            raise typer.Exit()
+        result = edit_rec(
+            editor=editor, url=url, title_in=title, tags_in=tags_in, desc=""
+        )
+        if result is not None:
+            url, title, tags_in, desc_in = result
+        else:
+            raise typer.Abort()
+
+    if not nofetch:
+        ptitle, pdesc, ptags, mime, bad = network_handler(url)
+        if bad:
+            print("Malformed URL\n")
+        elif mime:
+            print("HTTP HEAD requested")
+        elif ptitle == "" and title is None:
+            print("No title\n")
+        else:
+            print("Title: [%s]", ptitle)
+    else:
+        ptitle = pdesc = ptags = ""
+
+    if desc is None:
+        desc = "" if pdesc is None else pdesc
+    if title is None:
+        title = "" if ptitle is None else ptitle
+
+    bm = Bookmark(
+        URL=url,
+        metadata=title,
+        tags=tags_in,
+        desc=desc,
+        flags=0,
+    )
+
+    with DAL(env_config=config) as dal:
+        # result = dal.insert_bookmark(bm)
+        result = None
+        typer.echo(f"-M- {title} {url} inserted at {result}")
 
 
 if __name__ == "__main__":
