@@ -53,7 +53,7 @@ class DAL:
     is_simulated_environment: bool
 
     def __init__(self, env_config: "Environment"):
-        self.bm_db_url = env_config.bm_db_url
+        self.bm_db_url = env_config.twbm_db_url
         self.record_classes = {
             "Bookmark": Bookmark,
         }

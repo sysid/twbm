@@ -2,10 +2,11 @@ import os
 
 import pytest
 
+from twbm.db.dal import DAL, metadata, Bookmark
+
 os.environ[
     "RUN_ENV"
 ] = "testing"  # Gotcha: make sure environment setup is before app is sourced
-from db.dal import DAL, metadata, Bookmark
 from twbm.environment import config
 
 

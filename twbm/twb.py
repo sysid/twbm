@@ -134,7 +134,7 @@ def search(
     verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     if verbose:
-        typer.echo(f"Using DB: {config.bm_db_url}")
+        typer.echo(f"Using DB: {config.twbm_db_url}")
     tags_all_ = tags_all.lower().replace(" ", "").split(",")
     tags_any_ = tags_any.lower().replace(" ", "").split(",")
     tags_all_not_ = tags_all_not.lower().replace(" ", "").split(",")
@@ -171,7 +171,7 @@ def delete(
     verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     if verbose:
-        typer.echo(f"Using DB: {config.bm_db_url}")
+        typer.echo(f"Using DB: {config.twbm_db_url}")
 
     dal = DAL(env_config=config)
     with dal as dal:
@@ -218,7 +218,7 @@ def update(
     verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     if verbose:
-        typer.echo(f"Using DB: {config.bm_db_url}")
+        typer.echo(f"Using DB: {config.twbm_db_url}")
     tags_ = tags.lower().replace(" ", "").split(",")
     tags_not_ = tags_not.lower().replace(" ", "").split(",")
 
@@ -239,5 +239,5 @@ def update(
 
 
 if __name__ == "__main__":
-    _log.debug("xxxxxxxxxxx")
+    _log.debug(config)
     app()
