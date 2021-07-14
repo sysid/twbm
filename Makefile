@@ -37,7 +37,7 @@ build:
 #	git push
 	python setup.py sdist
 
-upload: build
+upload:
 	@echo "upload"
 	twine upload --verbose dist/*
 
@@ -62,7 +62,12 @@ uninstall:
 	pipx uninstall twbm
 
 .PHONY: bump-minor
-bump-minor:  ## bump
+bump-minor:  ## bump-minor
 	#bumpversion --dry-run --allow-dirty --verbose patch
 	#bumpversion --verbose patch
 	bumpversion --verbose minor
+
+.PHONY: bump-patch
+bump-patch:  ## bump-patch
+	#bumpversion --dry-run --allow-dirty --verbose patch
+	bumpversion --verbose patch
