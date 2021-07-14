@@ -60,3 +60,9 @@ install: uninstall clean build
 
 uninstall:
 	pipx uninstall twbm
+
+.PHONY: bump-minor
+bump-minor:  ## bump
+	#bumpversion --dry-run --allow-dirty --verbose patch
+	#bumpversion --verbose patch
+	bumpversion --verbose minor
