@@ -412,7 +412,8 @@ def data():
 
 @pytest.fixture()
 def init_db():
-    dsn = "sqlite:///test/tests_data/bm_test.db"  # TODO: respect enviornment varialbe
+    # TWBM_DB_URL=sqlite:///test/tests_data/bm_test.db
+    dsn = os.environ.get('TWBM_DB_URL', "sqlite:///test/tests_data/bm_test.db")
     (Path(__file__).parent / "tests_data/bm_test.db").unlink(missing_ok=True)
     alembic_root = Path(__file__).parent.parent / "twbm/db"
 

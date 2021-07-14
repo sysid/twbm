@@ -7,7 +7,7 @@ from typing import Sequence
 
 import typer
 
-from twbm.buku import edit_rec, network_handler
+from twbm.buku import edit_rec, BukuDb
 from twbm.db.dal import Bookmark, DAL
 from twbm.environment import config
 
@@ -38,6 +38,33 @@ def match_any_tag(tags: Sequence, bm_tags: Sequence) -> bool:
     return len(set(bm_tags) & set(tags)) > 0
 
 
+def _update_tags(
+        ids: Sequence[int],
+        tags: Sequence[str] = None,
+        tags_not: Sequence[str] = None,
+        force: bool = False,
+):
+    bms = Bookmarks(fts_query="").bms
+    if tags is None:
+        tags = ("",)
+    if tags_not is None:
+        tags_not = ("",)
+
+    dal = DAL(env_config=config)
+    with dal as dal:
+        for id in ids:
+            bm = bms[id - 1]
+            if force:
+                new_tags = set(tags)
+            else:
+                new_tags = (set(bm.split_tags) | set(tags)) - set(tags_not)
+            new_tags = sorted(list(new_tags))
+            new_tags = f",{','.join(new_tags)},"
+            _log.debug(f"{new_tags=}")
+            bm.tags = new_tags
+            dal.update_bookmark(bm)
+
+
 class Bookmarks:
     bms: Sequence[Bookmark]
 
@@ -49,7 +76,7 @@ class Bookmarks:
 
     @staticmethod
     def match_all(
-        tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
+            tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
     ) -> Sequence[Bookmark]:
         if not_:
             filtered = [bm for bm in bms if not match_all_tags(tags, bm.split_tags)]
@@ -59,7 +86,7 @@ class Bookmarks:
 
     @staticmethod
     def match_any(
-        tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
+            tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
     ) -> Sequence[Bookmark]:
         if not_:
             filtered = [bm for bm in bms if not match_any_tag(tags, bm.split_tags)]
@@ -122,24 +149,24 @@ def process(bms: Sequence[Bookmark]):
 
 @app.command()
 def search(
-    # ctx: typer.Context,
-    fts_query: str = typer.Argument("", help="FTS query"),
-    tags_all: str = typer.Option(
-        "", "-t", "--tags", help="match all, comma seperated list"
-    ),
-    tags_any: str = typer.Option(
-        "", "-T", "--Tags", help="match any, comma seperated list"
-    ),
-    tags_all_not: str = typer.Option(
-        "", "-n", "--tags", help="not match all, comma seperated list"
-    ),
-    tags_any_not: str = typer.Option(
-        "", "-N", "--Tags", help="not match any, comma seperated list"
-    ),
-    non_interactive: bool = typer.Option(
-        False, "--np", help="do not prompt for opening URLs"
-    ),
-    verbose: bool = typer.Option(False, "-v", "--verbose"),
+        # ctx: typer.Context,
+        fts_query: str = typer.Argument("", help="FTS query"),
+        tags_all: str = typer.Option(
+            "", "-t", "--tags", help="match all, comma seperated list"
+        ),
+        tags_any: str = typer.Option(
+            "", "-T", "--Tags", help="match any, comma seperated list"
+        ),
+        tags_all_not: str = typer.Option(
+            "", "-n", "--tags", help="not match all, comma seperated list"
+        ),
+        tags_any_not: str = typer.Option(
+            "", "-N", "--Tags", help="not match any, comma seperated list"
+        ),
+        non_interactive: bool = typer.Option(
+            False, "--np", help="do not prompt for opening URLs"
+        ),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}")
@@ -174,9 +201,9 @@ def search(
 
 @app.command()
 def delete(
-    # ctx: typer.Context,
-    id_: int = typer.Argument(..., help="match all, comma seperated list"),
-    verbose: bool = typer.Option(False, "-v", "--verbose"),
+        # ctx: typer.Context,
+        id_: int = typer.Argument(..., help="match all, comma seperated list"),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}")
@@ -187,75 +214,16 @@ def delete(
         typer.echo(f"Deleted: {result}")
 
 
-def _update_tags(
-    ids: Sequence[int],
-    tags: Sequence[str] = None,
-    tags_not: Sequence[str] = None,
-    force: bool = False,
-):
-    bms = Bookmarks(fts_query="").bms
-    if tags is None:
-        tags = ("",)
-    if tags_not is None:
-        tags_not = ("",)
-
-    dal = DAL(env_config=config)
-    with dal as dal:
-        for id in ids:
-            bm = bms[id - 1]
-            if force:
-                new_tags = set(tags)
-            else:
-                new_tags = (set(bm.split_tags) | set(tags)) - set(tags_not)
-            new_tags = sorted(list(new_tags))
-            new_tags = f",{','.join(new_tags)},"
-            _log.debug(f"{new_tags=}")
-            bm.tags = new_tags
-            dal.update_bookmark(bm)
-
-
 @app.command()
 def update(
-    # ctx: typer.Context,
-    input_: str = typer.Argument(None, help="tags, comma seperated list, no blanks"),
-    tags: str = typer.Option("", "-t", "--tags", help="add taglist to tags"),
-    tags_not: str = typer.Option("", "-n", "--tags", help="remove taglist from tags"),
-    force: bool = typer.Option(
-        False, "-f", "--force", help="overwrite tags with taglist"
-    ),
-    verbose: bool = typer.Option(False, "-v", "--verbose"),
-):
-    if verbose:
-        typer.echo(f"Using DB: {config.twbm_db_url}")
-    tags_ = tags.lower().replace(" ", "").split(",")
-    tags_not_ = tags_not.lower().replace(" ", "").split(",")
-
-    # Gotcha: running from IDE looks like pipe
-    is_pipe = not isatty(sys.stdin.fileno())
-    ids: Sequence[int] = list()
-
-    if is_pipe:
-        input_ = sys.stdin.readline()
-
-    try:
-        ids = [int(x) for x in input_.split()]
-    except ValueError as e:
-        typer.secho(f"-E- Wrong input format.", color=typer.colors.RED)
-        raise typer.Abort()
-
-    _update_tags(ids, tags_, tags_not_, force=force)
-
-
-@app.command()
-def update(
-    # ctx: typer.Context,
-    input_: str = typer.Argument(None, help="tags, comma seperated list, no blanks"),
-    tags: str = typer.Option("", "-t", "--tags", help="add taglist to tags"),
-    tags_not: str = typer.Option("", "-n", "--tags", help="remove taglist from tags"),
-    force: bool = typer.Option(
-        False, "-f", "--force", help="overwrite tags with taglist"
-    ),
-    verbose: bool = typer.Option(False, "-v", "--verbose"),
+        # ctx: typer.Context,
+        input_: str = typer.Argument(None, help="tags, comma seperated list, no blanks"),
+        tags: str = typer.Option("", "-t", "--tags", help="add taglist to tags"),
+        tags_not: str = typer.Option("", "-n", "--tags", help="remove taglist from tags"),
+        force: bool = typer.Option(
+            False, "-f", "--force", help="overwrite tags with taglist"
+        ),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}")
@@ -280,16 +248,16 @@ def update(
 
 @app.command()
 def add(
-    # ctx: typer.Context,
-    url: str = typer.Argument(None, help="URL"),
-    tags: str = typer.Option("", "-t", help="add taglist to tags"),
-    title: str = typer.Option("", "--title"),
-    desc: str = typer.Option("", "-d", "--desc"),
-    add: bool = typer.Option(False, "-a", "--add", help="non-interactive"),
-    verbose: bool = typer.Option(False, "-v", "--verbose"),
-    nofetch: bool = typer.Option(
-        False, "-f", "--nofetch", help="do not try to fetch metadata from web"
-    ),
+        # ctx: typer.Context,
+        url: str = typer.Argument(None, help="URL"),
+        tags: str = typer.Option("", "-t", help="add taglist to tags"),
+        title: str = typer.Option("", "--title"),
+        desc: str = typer.Option("", "-d", "--desc"),
+        add: bool = typer.Option(False, "-a", "--add", help="non-interactive"),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
+        nofetch: bool = typer.Option(
+            False, "-f", "--nofetch", help="do not try to fetch metadata from web"
+        ),
 ):
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}")
@@ -312,36 +280,46 @@ def add(
         else:
             raise typer.Abort()
 
-    if not nofetch:
-        ptitle, pdesc, ptags, mime, bad = network_handler(url)
-        if bad:
-            print("Malformed URL\n")
-        elif mime:
-            print("HTTP HEAD requested")
-        elif ptitle == "" and title is None:
-            print("No title\n")
-        else:
-            print("Title: [%s]", ptitle)
-    else:
-        ptitle = pdesc = ptags = ""
+    result = BukuDb(dbfile=config.dbfile).add_rec(url=url, title_in=title, tags_in=tags_in, desc=desc, immutable=0,
+                                                  delay_commit=False, fetch=(not nofetch))
+    typer.echo(f"-M- {title} {url} inserted at {result}")
 
-    if desc is None:
-        desc = "" if pdesc is None else pdesc
-    if title is None:
-        title = "" if ptitle is None else ptitle
 
-    bm = Bookmark(
-        URL=url,
-        metadata=title,
-        tags=tags_in,
-        desc=desc,
-        flags=0,
-    )
+@app.command()
+def delete(
+        # ctx: typer.Context,
+        id_: int = typer.Argument(..., help="id to delete"),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
+):
+    if verbose:
+        typer.echo(f"Using DB: {config.twbm_db_url}")
+    _ = BukuDb(dbfile=config.dbfile).delete_rec(index=id_, delay_commit=False)
 
-    with DAL(env_config=config) as dal:
-        # result = dal.insert_bookmark(bm)
-        result = None
-        typer.echo(f"-M- {title} {url} inserted at {result}")
+
+@app.command()
+def show(
+        # ctx: typer.Context,
+        id_: int = typer.Argument(..., help="id to print"),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
+):
+    if verbose:
+        typer.echo(f"Using DB: {config.twbm_db_url}")
+    _ = BukuDb(dbfile=config.dbfile).print_rec(index=id_)
+
+
+@app.command()
+def write(
+        # ctx: typer.Context,
+        id_: int = typer.Argument(..., help="id to print"),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
+        nofetch: bool = typer.Option(
+            False, "-f", "--nofetch", help="do not try to fetch metadata from web"
+        ),
+):
+    immutable = -1 if nofetch else 1
+    if verbose:
+        typer.echo(f"Using DB: {config.twbm_db_url}")
+    _ = BukuDb(dbfile=config.dbfile).edit_update_rec(index=id_, immutable=immutable)
 
 
 if __name__ == "__main__":
