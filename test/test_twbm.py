@@ -14,14 +14,16 @@ _log = logging.getLogger(__name__)
 # log_fmt = r'%(asctime)-15s %(levelname)s %(name)s %(funcName)s:%(lineno)d %(message)s'
 # logging.basicConfig(format=log_fmt, level=logging.DEBUG)
 
-tests_data_path = (os.path.join(os.path.dirname(os.path.realpath(__file__)), 'tests_data'))
+tests_data_path = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)), "tests_data"
+)
 
 # TEST_TEMP_DIR_OBJ = TemporaryDirectory(prefix='bukutest_')
-TEST_TEMP_DIR_OBJ = TemporaryDirectory(prefix='bukutest_')
+TEST_TEMP_DIR_OBJ = TemporaryDirectory(prefix="bukutest_")
 # TEST_TEMP_DIR_PATH = TEST_TEMP_DIR_OBJ.name
-TEST_TEMP_DIR_PATH = '/tmp/bukutest'
-TEST_TEMP_DBDIR_PATH = os.path.join(TEST_TEMP_DIR_PATH, 'buku')
-TEST_TEMP_DBFILE_PATH = os.path.join(TEST_TEMP_DBDIR_PATH, 'bookmarks.db')
+TEST_TEMP_DIR_PATH = "/tmp/bukutest"
+TEST_TEMP_DBDIR_PATH = os.path.join(TEST_TEMP_DIR_PATH, "buku")
+TEST_TEMP_DBFILE_PATH = os.path.join(TEST_TEMP_DBDIR_PATH, "bookmarks.db")
 
 """
 test for sort order:
@@ -50,23 +52,25 @@ def db(request, setup):
     return db
 
 
-class PrettySafeLoader(yaml.SafeLoader):  # pylint: disable=too-many-ancestors,too-few-public-methods
+class PrettySafeLoader(
+    yaml.SafeLoader
+):  # pylint: disable=too-many-ancestors,too-few-public-methods
     def construct_python_tuple(self, node):
         return tuple(self.construct_sequence(node))
 
 
 PrettySafeLoader.add_constructor(
-    u'tag:yaml.org,2002:python/tuple',
-    PrettySafeLoader.construct_python_tuple)
+    "tag:yaml.org,2002:python/tuple", PrettySafeLoader.construct_python_tuple
+)
 
 
 @pytest.fixture()
 def chrome_db():
     # compatibility
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    res_yaml_file = os.path.join(dir_path, 'tests_data', '25491522_res.yaml')
-    res_nopt_yaml_file = os.path.join(dir_path, 'tests_data', '25491522_res_nopt.yaml')
-    json_file = os.path.join(dir_path, 'tests_data', 'Bookmarks')
+    res_yaml_file = os.path.join(dir_path, "tests_data", "25491522_res.yaml")
+    res_nopt_yaml_file = os.path.join(dir_path, "tests_data", "25491522_res_nopt.yaml")
+    json_file = os.path.join(dir_path, "tests_data", "Bookmarks")
     return json_file, res_yaml_file, res_nopt_yaml_file
 
 
@@ -81,7 +85,7 @@ def test_initdb(setup):
 
 
 class ChromeTests:
-    @pytest.mark.parametrize('add_pt', [True])
+    @pytest.mark.parametrize("add_pt", [True])
     def test_load_chrome_database(self, chrome_db, db, add_pt):
         """test method."""
         # compatibility
@@ -90,7 +94,7 @@ class ChromeTests:
         db.load_chrome_database(json_file, None, add_pt)
         _ = None
 
-    @pytest.mark.parametrize('add_pt', [True, False])
+    @pytest.mark.parametrize("add_pt", [True, False])
     def test_load_chrome_database_mock(self, chrome_db, db, add_pt):
         """test method."""
         # compatibility
@@ -99,7 +103,7 @@ class ChromeTests:
         # with parent-tags and without
         res_yaml_file = chrome_db[1] if add_pt else chrome_db[2]
 
-        with open(res_yaml_file, 'r') as f:
+        with open(res_yaml_file, "r") as f:
             try:
                 res_yaml = yaml.load(f, Loader=yaml.FullLoader)
             except RuntimeError:
@@ -113,9 +117,13 @@ class ChromeTests:
         _ = None
 
     def test_traverse_bm_folder(self, db, data):
-        bookmark_bar = data['roots']['bookmark_bar']
-        for item in db.traverse_bm_folder(bookmark_bar['children'], unique_tag=None, folder_name='Bookmarks bar',
-                                          add_parent_folder_as_tag=True):
-            if 'SearchPreview' in item[1]:
-                assert item[2] == ',bookmarks bar,f+,xxx,yyy,'
+        bookmark_bar = data["roots"]["bookmark_bar"]
+        for item in db.traverse_bm_folder(
+            bookmark_bar["children"],
+            unique_tag=None,
+            folder_name="Bookmarks bar",
+            add_parent_folder_as_tag=True,
+        ):
+            if "SearchPreview" in item[1]:
+                assert item[2] == ",bookmarks bar,f+,xxx,yyy,"
             print(item)

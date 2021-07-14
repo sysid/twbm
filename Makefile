@@ -7,11 +7,11 @@ MAKE          = make
 
 VERSION       = $(shell cat twbm/__init__.py | grep __version__ | sed "s/__version__ = //" | sed "s/'//g")
 
-.PHONY: all help clean build test
+.PHONY: all help clean build test black
 
 # Put it first so that "make" without argument is like "make help".
 help:
-	@echo "$(MAKE) [all,clean,build,upload,test]"
+	@echo "$(MAKE) [all,clean,build,upload,test,black,install,uninstall]"
 
 default: all
 
@@ -22,7 +22,7 @@ all: clean build upload tag
 
 test:
 #	./scripts/test
-	python -m py.test test -vv
+	TWBM_DB_URL=sqlite:///test/tests_data/bm_test.db python -m py.test test -vv
 
 
 clean:
@@ -45,3 +45,18 @@ tag:
 	@echo "tagging $(VERSION)"
 	git tag -a $(VERSION) -m "version $(VERSION)"
 	git push --tags
+
+black:
+	@echo "Formatting with black"
+	#black --check --verbose --exclude="twbm/buku.py" .
+	black --verbose --exclude="twbm/buku.py" .
+
+init: clean
+	@cp -v $(HOME)/vimwiki/buku/bm.db $(HOME)/dev/py/twbm/sql/bm.db
+
+
+install: uninstall clean build
+	pipx install $(HOME)/dev/py/twbm
+
+uninstall:
+	pipx uninstall twbm

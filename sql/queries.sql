@@ -2,27 +2,6 @@
 select *
 from bookmarks;
 
--- name: create_db#
-CREATE TABLE IF NOT EXISTS "main"."bookmarks2" (
-    "id" INTEGER PRIMARY KEY,
-    "URL" TEXT NOT NULL UNIQUE,
-    "metadata" text default '',
-    "tags" text default ',',
-    "desc" text default '',
-    "flags" integer default '',
-    "last_update_ts" DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TRIGGER IF NOT EXISTS [UpdateLastTime]
-    AFTER
-    UPDATE
-    ON bookmarks2
-    FOR EACH ROW
-    WHEN NEW.last_update_ts <= OLD.last_update_ts
-BEGIN
-    update bookmarks2 set last_update_ts=CURRENT_TIMESTAMP where id=OLD.id;
-END;
-
 /*
  For tracking the database version, I use the built in user-version variable that sqlite provides
  (sqlite does nothing with this variable, you are free to use it however you please).
@@ -32,3 +11,33 @@ END;
 PRAGMA user_version;
 
 -- PRAGMA user_version = 1;
+
+-- name: get_related_tags
+with RECURSIVE split(tags, rest) AS (
+    SELECT '', tags || ','
+    FROM bookmarks
+    WHERE tags LIKE '%,ccc,%'
+    UNION ALL
+    SELECT substr(rest, 0, instr(rest, ',')),
+           substr(rest, instr(rest, ',') + 1)
+    FROM split
+    WHERE rest <> '')
+SELECT distinct tags
+FROM split
+WHERE tags <> ''
+ORDER BY tags;
+
+
+-- name: get_all_tags
+with RECURSIVE split(tags, rest) AS (
+    SELECT '', tags || ','
+    FROM bookmarks
+    UNION ALL
+    SELECT substr(rest, 0, instr(rest, ',')),
+           substr(rest, instr(rest, ',') + 1)
+    FROM split
+    WHERE rest <> '')
+SELECT distinct tags
+FROM split
+WHERE tags <> ''
+ORDER BY tags;
