@@ -105,6 +105,14 @@ def test_get_related_tags(dal, tag, result):
     _ = None
 
 
+def test_get_all_tags(dal):
+    tags = dal.get_all_tags()
+    print(tags)
+    result = ["aaa", "bbb", "ccc", "xxx", "yyy"]
+    assert tags == result
+    assert len(tags) >= len(result)
+
+
 class TestBuku:
     def test_bukudb(self):
         db = buku.BukuDb(dbfile=config.dbfile)

@@ -1,5 +1,4 @@
-bm.db
-bm_test.db
+*.db
 .env
 .env.pycharm
 ############################## Python.gitignore ##############################

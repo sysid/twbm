@@ -26,3 +26,18 @@ SELECT distinct tags
 FROM split
 WHERE tags <> ''
 ORDER BY tags;
+
+
+-- name: get_all_tags
+with RECURSIVE split(tags, rest) AS (
+    SELECT '', tags || ','
+    FROM bookmarks
+    UNION ALL
+    SELECT substr(rest, 0, instr(rest, ',')),
+           substr(rest, instr(rest, ',') + 1)
+    FROM split
+    WHERE rest <> '')
+SELECT distinct tags
+FROM split
+WHERE tags <> ''
+ORDER BY tags;

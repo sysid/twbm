@@ -186,3 +186,25 @@ class DAL:
         #     # noinspection PyRedundantParentheses
         #     return (Bookmark(),)
         return [tags[0] for tags in sql_result]
+
+    def get_all_tags(self):
+        # noinspection SqlResolve
+        query = """
+            -- name: get_all_tags
+            with RECURSIVE split(tags, rest) AS (
+                SELECT '', tags || ','
+                FROM bookmarks
+                UNION ALL
+                SELECT substr(rest, 0, instr(rest, ',')),
+                       substr(rest, instr(rest, ',') + 1)
+                FROM split
+                WHERE rest <> '')
+            SELECT distinct tags
+            FROM split
+            WHERE tags <> ''
+            ORDER BY tags;
+        """
+        queries = aiosql.from_str(query, "sqlite3")
+        sql_result = queries.get_all_tags(self.conn.connection)
+
+        return [tags[0] for tags in sql_result]

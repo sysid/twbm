@@ -50,3 +50,6 @@ black:
 	@echo "Formatting with black"
 	#black --check --verbose --exclude="twbm/buku.py" .
 	black --verbose --exclude="twbm/buku.py" .
+
+init: clean
+	@cp -v $(HOME)/vimwiki/buku/bm.db $(HOME)/dev/py/twbm/sql/bm.db
