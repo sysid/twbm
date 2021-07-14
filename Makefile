@@ -11,7 +11,7 @@ VERSION       = $(shell cat twbm/__init__.py | grep __version__ | sed "s/__versi
 
 # Put it first so that "make" without argument is like "make help".
 help:
-	@echo "$(MAKE) [all,clean,build,upload,test,black]"
+	@echo "$(MAKE) [all,clean,build,upload,test,black,install,uninstall]"
 
 default: all
 
@@ -22,7 +22,7 @@ all: clean build upload tag
 
 test:
 #	./scripts/test
-	python -m py.test test -vv
+	TWBM_DB_URL=sqlite:///test/tests_data/bm_test.db python -m py.test test -vv
 
 
 clean:
@@ -53,3 +53,10 @@ black:
 
 init: clean
 	@cp -v $(HOME)/vimwiki/buku/bm.db $(HOME)/dev/py/twbm/sql/bm.db
+
+
+install: uninstall clean build
+	pipx install $(HOME)/dev/py/twbm
+
+uninstall:
+	pipx uninstall twbm

@@ -1,51 +1,106 @@
-# twbm: Bookmarks via Commandline
+# twbm: Bookmarks via Commandline (CLI)
 
-Inspired by https://github.com/jarun/buku. Uses it partly under the hood. So why not just use it directly?
+Inspired by https://github.com/jarun/buku.
 
-I need better full-text search.
-I use tags extensively and want them to be checked for consistency.
-I struggle with the user interface, getting the format right remember the flags, ...
-I wanted some additional functionality, e.g. alphabetical ordering.
-I do not need bukuserver, after all it's about the command line.
+Why not just use it directly?
 
-If you are happy using buku, by all means stick with it. It is a great piece of OSS.
+- I am looking for better full-text search.
+- I use tags extensively and want them to be checked during bookmark input for consistency.
+- I struggle a bit with buku's user interface, getting the format right, remember the flags, ...
+- I wanted some additional functionality, e.g. alphabetical ordering of `deep` results...
+- I do not need tools like bukuserver, after all it's about the command line.
 
-There is no risk in trying twbm. twbm is 100% buku compatible. 
-If you do not like it you can go back with your bookmark collection any time without loosing anything.
+If you are happy using [buku](https://github.com/jarun/buku), by all means stick with it. It is a great piece of OSS.
 
-## Usage Examples
-### Bulk update using bash piping
+However, there is no risk in trying [twbm](https://github.com/sysid/twbm). twbm is 100% buku compatible.   
+If you do not like it you can migrate back without loosing your bookmark database.
+
+To harness `twbm`'s power, you need to use the correct FTS search syntax (see: https://www.sqlite.org/fts5.html chapter 3). 
+I did not make efforts to sanitize incorrect user input.  
+
+If you find a bug, please open an issue.
+
+## Usage
+There are two commands:
+1. twbm: CLI tool with FTS for bookmark management
+2. twbuku: basically plain buku with small enhancements and usage of an enhanced database
+
+This allows for usage of the battle-tested buku interface where applicable and benefit from additional features 
+while using one bookmark database.
+
+### Examples
 ```bash
-echo 1 2 | python ./twbm/twb.py update -t x
+# Bulk update of tags using bash piping
+echo 1 2 | twbm update -t x
+
+# FTS examples (https://www.sqlite.org/fts5.htm)
+twbm 'security "single-page"'
+twbm '"https://securit" *'
+twbm '^security'
+twbm 'postgres OR sqlite'
+twbm 'security NOT keycloak'
+
+# FTS combined with tag filtering
+twbm -t tag1,tag2 -n notag1 <searchquery>
 ```
+Taglists must not have blanks and have comma separator.
+
+Selection of multiple bookmarks for opening in browser is possible, of course:
+![Multi selection](multi-select.png)
+
+After selecting you are straight back at the bash prompt.
+
+## Installation
+```bash
+pipx twbm
+```
+The database schema needs to be upgraded to allow for FTS indexing:  
+- To upgrade your existing buku db: `twbm-upgrade-db.sh buku.db twbm.db`.  
+- To downgrade your existing twbm db: `twbm-downgrade-db.sh twbm.db buku.db`.  
+
+You can downgrade any time.
 
 ## Configuration
+Configure the location of your sqlite database:
 ```bash
 TWBM_DB_URL=sqlite:////$HOME/vimwiki/buku/bm.db bb search
 
-# alias
-alias b='twbm --db <pathto>/bm.db -n 1000 --deep'  # using patched buku
-alias bb='TWBM_DB_URL=sqlite://///<pathto>/bm.db bb search'  # using extended buku
+# aliases which I use
+alias b="twbuku --db $HOME/bm.db -n 1000 --deep"  # using patched original buku
+alias bb="TWBM_DB_URL=sqlite:////$HOME/bm.db twbm search"  # using extended CLI tool
+alias bbb="TWBM_DB_URL=sqlite:////$HOME/bm.db twbm"
+
 ```
 
-### Loading buku DB:
-use original interface, but parse additional hashtags in title. This allows to populated tags in Buku from title
-hashtags.
-`scripts/load_db.sh`
+## Architecture
+It uses certain `buku` functions in the background, but is generally rebuilt on top of: 
+-  [Typer](https://typer.tiangolo.com/)  
+-  [Pydantic](https://pydantic-docs.helpmanual.io/)  
+-  [SQLite FTS5](https://www.sqlite.org/fts5.html)  
+-  [aiosql](https://nackjicholson.github.io/aiosql/)  
+-  [SQLAlchemy](https://www.sqlalchemy.org/)  
+-  [alembic](https://alembic.sqlalchemy.org/en/latest/index.html)  
+  
+This should make it easy to extend and add functionality in an object-oriented manner.
+
 
 # Development
-## Howto patch buku
+## patch buku
 - download `buku` and compare with `buku.py`
 - update `buku.py`: `# tw: add title tagging` (customization: search for `# tw`)
 - GOTCHA: Exclude `buku.py` from `black`
 ```bash
 rm buku
 wget https://raw.githubusercontent.com/jarun/buku/master/buku .
+diff buku.py buku
 ```
 
-## Local installation
-- install twbm with pipx for local development: `pipx install ~/dev/py/twbm`
+## Local installation from sources
+- install twbm with pipx for local development: `pipx install ~/dev/py/twbm`, via `make install`
 - uninstall: `pipx uninstall twbm`  # GOTCHA: NOT THE PATH !!!!
 
-set `main.py:DBFILE` for testing
+## Testing
+`make test`
 
+## Roadmap
+- allow piping between twbm: `bb <word> | bb -t newtag`

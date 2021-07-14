@@ -1,8 +1,3 @@
-import os
-
-os.environ[
-    "RUN_ENV"
-] = "testing"  # Gotcha: make sure environment setup is before app is sourced
 from twbm.environment import config
 
 

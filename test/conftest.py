@@ -8,10 +8,6 @@ from alembic.config import Config
 
 from twbm.db.dal import DAL
 
-os.environ[
-    "RUN_ENV"
-] = "testing"  # Gotcha: make sure environment setup is before app is sourced
-
 import pytest
 from twbm.environment import config
 

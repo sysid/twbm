@@ -1,10 +1,4 @@
-import os
-
 import pytest
-
-os.environ[
-    "RUN_ENV"
-] = "testing"  # Gotcha: make sure environment setup is before app is sourced
 
 from twbm.twb import match_all_tags, match_any_tag, _update_tags, parse_tags, check_tags
 
@@ -12,10 +6,10 @@ from twbm.twb import match_all_tags, match_any_tag, _update_tags, parse_tags, ch
 @pytest.mark.parametrize(
     ("tags", "bm_tags", "result"),
     (
-            (("a", "b"), ("a", "b", "c", "d"), True),
-            (("a", "b"), ("b", "c", "d"), False),
-            (("a", "b"), ("b", "a"), True),
-            (("a", "b"), ("a",), False),
+        (("a", "b"), ("a", "b", "c", "d"), True),
+        (("a", "b"), ("b", "c", "d"), False),
+        (("a", "b"), ("b", "a"), True),
+        (("a", "b"), ("a",), False),
     ),
 )
 def test_match_all_tags(tags, bm_tags, result):
@@ -26,10 +20,10 @@ def test_match_all_tags(tags, bm_tags, result):
 @pytest.mark.parametrize(
     ("tags", "bm_tags", "result"),
     (
-            (("a", "b"), ("a", "b", "c", "d"), True),
-            (("a", "b", "x"), ("a", "b", "c", "d"), True),
-            (("a", "b", "x"), ("a",), True),
-            (("a", "b"), ("x", "y"), False),
+        (("a", "b"), ("a", "b", "c", "d"), True),
+        (("a", "b", "x"), ("a", "b", "c", "d"), True),
+        (("a", "b", "x"), ("a",), True),
+        (("a", "b"), ("x", "y"), False),
     ),
 )
 def test_match_any_tag(tags, bm_tags, result):
@@ -56,10 +50,10 @@ def test_match_any(dal):
 @pytest.mark.parametrize(
     ("ids", "tags", "tags_not", "force", "result"),
     (
-            ((1,), ("x",), ("ccc",), False, ",x,xxx,yyy,"),
-            ((1,), ("x",), None, True, ",x,"),
-            ((1,), None, None, False, ",ccc,xxx,yyy,"),
-            ((1,), None, ("ccc", "xxx", "yyy"), False, ",,"),
+        ((1,), ("x",), ("ccc",), False, ",x,xxx,yyy,"),
+        ((1,), ("x",), None, True, ",x,"),
+        ((1,), None, None, False, ",ccc,xxx,yyy,"),
+        ((1,), None, ("ccc", "xxx", "yyy"), False, ",,"),
     ),
 )
 def test_update(dal, ids, tags, tags_not, result, force):
@@ -71,9 +65,9 @@ def test_update(dal, ids, tags, tags_not, result, force):
 @pytest.mark.parametrize(
     ("tags", "result"),
     (
-            (("tag1", "tag2"), ",tag1,tag2,"),
-            (("tag2", "tag1"), ",tag1,tag2,"),
-            ((), ",,"),
+        (("tag1", "tag2"), ",tag1,tag2,"),
+        (("tag2", "tag1"), ",tag1,tag2,"),
+        ((), ",,"),
     ),
 )
 def test_parse_tags(tags, result):
@@ -83,10 +77,15 @@ def test_parse_tags(tags, result):
 @pytest.mark.parametrize(
     ("tags", "result"),
     (
-            (("a", "b"), ["a", "b"]),
-            (("xxx", "yyy"), []),
-            (("xxx", "yyy", "zzz"), ["zzz",]),
-            ((), []),
+        (("a", "b"), ["a", "b"]),
+        (("xxx", "yyy"), []),
+        (
+            ("xxx", "yyy", "zzz"),
+            [
+                "zzz",
+            ],
+        ),
+        ((), []),
     ),
 )
 def test_check_tags(dal, tags, result):

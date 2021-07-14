@@ -58,6 +58,7 @@ setup(
         "typer",
         "pydantic[dotenv]",
     ],
+    scripts=["scripts/twbm-downgrade-db.sh", "scripts/twbm-upgrade-db.sh"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",
