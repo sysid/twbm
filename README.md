@@ -35,18 +35,18 @@ Getting help: `twbm --help`
 
 ### Examples
 ```bash
-# Bulk update of tags using bash piping
-echo 1 2 | twbm update -t x
-
 # FTS examples (https://www.sqlite.org/fts5.htm)
-twbm 'security "single-page"'
-twbm '"https://securit" *'
-twbm '^security'
-twbm 'postgres OR sqlite'
-twbm 'security NOT keycloak'
+twbm search 'security "single-page"'
+twbm search '"https://securit" *'
+twbm search '^security'
+twbm search 'postgres OR sqlite'
+twbm search 'security NOT keycloak'
 
 # FTS combined with tag filtering
-twbm -t tag1,tag2 -n notag1 <searchquery>
+twbm search -t tag1,tag2 -n notag1 <searchquery>
+
+# Search -> select interactively -> pipe bookmark id downstream for processing
+twbm search xxxxx | twbm update -t x
 ```
 Taglists must not have blanks and have comma separator.
 
@@ -111,3 +111,5 @@ diff buku.py buku
 
 ## Roadmap
 - allow piping between twbm: `bb <word> | bb -t newtag`
+- full help
+- database creation
