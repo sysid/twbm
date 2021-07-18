@@ -15,7 +15,7 @@ def dal_pristine():
         yield dal
 
 
-def test_xxx(dal):
+def test_reset_db(dal):
     _ = None
 
 
@@ -70,7 +70,7 @@ def test_insert_bm(dal):
 
 
 def test_delete_bm(dal):
-    result = dal.delete_bookmark(id_=1)
+    result = dal.delete_bookmark(id=1)
     print(result)
 
     assert dal.get_bookmarks(fts_query="xxxxx")[0].id is None

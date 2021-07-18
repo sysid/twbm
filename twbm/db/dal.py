@@ -79,22 +79,24 @@ class DAL:
         return self._conn
 
     # TODO: not working
-    def delete_bookmark(self, id_: int):
+    def delete_bookmark(self, id: int) -> int:
         query = """
             -- name: delete_bookmark<!
-            delete from bookmarks where id = :id;
+            delete from bookmarks where id = :id
+            returning *;
         """
         queries = aiosql.from_str(query, "sqlite3")
-        result = queries.delete_bookmark(self.conn.connection, id=id_)
+        result = queries.delete_bookmark(self.conn.connection, id=id)
         self.conn.connection.commit()
         return result
 
-    def insert_bookmark(self, bm: Bookmark):
+    def insert_bookmark(self, bm: Bookmark) -> int:
         query = """
             -- name: insert_bookmark<!
             -- record_class: Bookmark
             insert into bookmarks (URL, metadata, tags, desc, flags)
-            values (:URL, :metadata, :tags, :desc, :flags);
+            values (:URL, :metadata, :tags, :desc, :flags)
+            returning *;
         """
         queries = aiosql.from_str(query, "sqlite3", record_classes=self.record_classes)
         result = queries.insert_bookmark(
@@ -108,17 +110,18 @@ class DAL:
         self.conn.connection.commit()
         return result
 
-    def update_bookmark(self, bm: Bookmark):
+    def update_bookmark(self, bm: Bookmark) -> int:
         query = """
             -- name: update_bookmark<!
             update bookmarks
             set tags = :tags
             where id = :id
+            returning *
+            ;
         """
         queries = aiosql.from_str(query, "sqlite3")
         result = queries.update_bookmark(self.conn.connection, id=bm.id, tags=bm.tags)
         self.conn.connection.commit()
-        print(f"{result=}")
         return result
 
     def get_bookmarks(self, fts_query: str) -> Sequence[Bookmark]:

@@ -1,6 +1,25 @@
 import pytest
 
-from twbm.twb import match_all_tags, match_any_tag, _update_tags, parse_tags, check_tags
+from twbm.twb import match_all_tags, match_any_tag, _update_tags, parse_tags, check_tags, clean_tags
+
+
+@pytest.mark.parametrize(
+    ("tags", "result"),
+    (
+            (("a", "b"), ["a", "b"]),
+            (("b", "a"), ["a", "b"]),
+            (("a", ",b"), ["a", "b"]),
+            (("a,", ",b"), ["a", "b"]),
+            (("a,xxx", ",b"), ["a", "b", "xxx"]),
+            ((), []),
+            (("a,", ",b", "A"), ["a", "b"]),
+            (("a,A", ",b", "A"), ["a", "b"]),
+    ),
+)
+def test_clean_tags(tags, result):
+    # res = match_all_tags(('a', 'b'), ('a', 'b', 'c', 'd'))
+    assert clean_tags(tags) == result
+
 
 
 @pytest.mark.parametrize(

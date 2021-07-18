@@ -3,7 +3,7 @@ import os
 import sys
 import webbrowser
 from os import isatty
-from typing import Sequence
+from typing import Sequence, List
 
 import typer
 
@@ -23,6 +23,17 @@ fts_sql = """
 -- name: fts
 -- record_class: Bookmark
 """
+
+
+def clean_tags(raw_tags: Sequence[str]) -> Sequence[str]:
+    tags = set()
+    tags_ = set(tag.strip().strip(',').lower() for tag in raw_tags)
+    for tag in tags_:
+        tags__ = set(t for t in tag.split(',') if t != ',')
+        tags |= tags__
+    tags = sorted(tags)
+    _log.debug(f"cleaned tags: {tags}")
+    return tags
 
 
 def parse_tags(tags: Sequence[str]) -> str:
@@ -157,22 +168,40 @@ def search(
         # ctx: typer.Context,
         fts_query: str = typer.Argument("", help="FTS query"),
         tags_all: str = typer.Option(
-            "", "-t", "--tags", help="match all, comma seperated list"
+            "", "-t", "--tags", help="match all, comma separated list"
         ),
         tags_any: str = typer.Option(
-            "", "-T", "--Tags", help="match any, comma seperated list"
+            "", "-T", "--Tags", help="match any, comma separated list"
         ),
         tags_all_not: str = typer.Option(
-            "", "-n", "--tags", help="not match all, comma seperated list"
+            "", "-n", "--ntags", help="not match all, comma separated list"
         ),
         tags_any_not: str = typer.Option(
-            "", "-N", "--Tags", help="not match any, comma seperated list"
+            "", "-N", "--Ntags", help="not match any, comma separated list"
         ),
         non_interactive: bool = typer.Option(
-            False, "--np", help="do not prompt for opening URLs"
+            False, "--np", help="no prompt"
         ),
         verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
+    """
+    Searches bookmark database with full text search capabilities (FTS)
+    (see: https://www.sqlite.org/fts5.html)
+
+    Title, URL and description are FTS indexed. Tags are not part of FTS.
+
+    Tags must be specified as comma separated list without blanks.
+    Correct FTS search syntax: https://www.sqlite.org/fts5.html chapter 3.
+
+    Examples:\n
+    twbm search 'security "single-page"'\n
+    twbm search '"https://securit" *'\n
+    twbm search '^security'\n
+    twbm search 'postgres OR sqlite'\n
+    twbm search 'security NOT keycloak'\n
+    twbm search -t tag1,tag2 -n notag1 <searchquery>\n
+    twbm search xxxxx | twbm update -t x\n
+    """
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
     tags_all_ = tags_all.lower().replace(" ", "").split(",")
@@ -207,16 +236,18 @@ def search(
 @app.command()
 def delete(
         # ctx: typer.Context,
-        id_: int = typer.Argument(..., help="match all, comma seperated list"),
+        id_: int = typer.Argument(..., help="id to delete"),
         verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
 
-    dal = DAL(env_config=config)
-    with dal as dal:
-        result = dal.delete_bookmark(id_)
-        typer.echo(f"Deleted: {result}", err=True)
+    # use buku because of DB compactdb
+    _ = BukuDb(dbfile=config.dbfile).delete_rec(index=id_, delay_commit=False)
+
+    # with DAL(env_config=config) as dal:
+    #     result = dal.delete_bookmark(id=id_)
+    #     typer.echo(f"Deleted index: {result}")
 
 
 @app.command()
@@ -254,26 +285,34 @@ def update(
 @app.command()
 def add(
         # ctx: typer.Context,
-        url: str = typer.Argument(None, help="URL"),
-        tags: str = typer.Option("", "-t", help="add taglist to tags"),
+        url_data: List[str] = typer.Argument(..., help="URL and tags"),
         title: str = typer.Option("", "--title"),
         desc: str = typer.Option("", "-d", "--desc"),
-        add: bool = typer.Option(False, "-a", "--add", help="non-interactive"),
+        edit: bool = typer.Option(False, "-e", "--edit", help="open in editor"),
         verbose: bool = typer.Option(False, "-v", "--verbose"),
         nofetch: bool = typer.Option(
             False, "-f", "--nofetch", help="do not try to fetch metadata from web"
         ),
 ):
+    """
+    Adds booksmarks to database and FTS index.
+
+    Provide URL (required) and tags (optional) as parameters.
+
+    Example:
+        twbm add https://www.google.com tag1, tag2 --title "<title>"
+    """
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
-    tags_ = tags.lower().replace(" ", "").split(",")
+    url = url_data[0].strip().strip(',')
+    tags = clean_tags(url_data[1:])
 
-    if len(unknown_tags := check_tags(tags_)) > 0:
+    if len(unknown_tags := check_tags(tags)) > 0:
         typer.confirm(f"Create {unknown_tags=} ?", abort=True)
 
-    tags_in = parse_tags(tags_)
+    tags_in = parse_tags(tags)
 
-    if not add:
+    if edit:
         editor = os.environ.get("EDITOR", None)
         if editor is None:
             typer.secho(
@@ -298,17 +337,6 @@ def add(
         delay_commit=False,
         fetch=(not nofetch),
     )
-
-
-@app.command()
-def delete(
-        # ctx: typer.Context,
-        id_: int = typer.Argument(..., help="id to delete"),
-        verbose: bool = typer.Option(False, "-v", "--verbose"),
-):
-    if verbose:
-        typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
-    _ = BukuDb(dbfile=config.dbfile).delete_rec(index=id_, delay_commit=False)
 
 
 @app.command()
@@ -342,12 +370,19 @@ def tags(
         # ctx: typer.Context,
         tag: str = typer.Argument(
             None,
-            help="tag for which associated tags should be found, None: all tags are shown",
+            help="tag for which related tags should be shown. No input: all tags are printed.",
         ),
         verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
+    """
+    No parameter: Show all tags
+
+    With tag as parameter: Show related tags, i.e. tags which are used in combination with tag.
+    """
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
+
+    tag = tag.strip(',').strip().lower()
 
     with DAL(env_config=config) as dal:
         if tag is None:
