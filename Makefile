@@ -24,6 +24,9 @@ test:  ## run tests
 #	./scripts/test
 	TWBM_DB_URL=sqlite:///test/tests_data/bm_test.db python -m py.test test -vv
 
+.PHONY: test-shell
+test-shell:  ## run tests
+	./scripts/test-pipe.sh
 
 .PHONY: clean
 clean:  ## remove ./dist

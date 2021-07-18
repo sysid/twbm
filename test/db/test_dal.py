@@ -111,5 +111,5 @@ class TestBuku:
     def test_bukudb(self):
         db = buku.BukuDb(dbfile=config.dbfile)
         print(f"Testing: {config.dbfile=}")
-        db.add_rec("https://example.com")
+        db.add_rec("https://example.com", title_in="")
         # db.delete_rec(1)

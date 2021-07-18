@@ -63,9 +63,9 @@ def _update_tags(
 ):
     bms = Bookmarks(fts_query="").bms
     if tags is None:
-        tags = ("",)
+        tags = ()
     if tags_not is None:
-        tags_not = ("",)
+        tags_not = ()
 
     with DAL(env_config=config) as dal:
         for id in ids:
@@ -138,29 +138,33 @@ def process(bms: Sequence[Bookmark]):
     typer.secho(f"Selection: ", fg=typer.colors.GREEN, err=True)
     selection = [x for x in input().split()]
 
-    # open in browser if no command letter
     try:
-        selection = [int(x) for x in selection]
-        for i in selection:
-            webbrowser.open(bms[i].URL, new=2)
-        return
-    except ValueError as e:
-        pass
-
-    # with command letter
-    cmd = str(selection[0])
-    selection = [int(x) for x in selection[1:]]
-    ids = list()
-    if cmd == "p":
-        if len(selection) == 0:
-            ids = [bm.id for bm in bms]
-        else:
+        # open in browser if no command letter
+        try:
+            selection = [int(x) for x in selection]
             for i in selection:
-                ids.append(bms[i].id)
+                webbrowser.open(bms[i].URL, new=2)
+            return
+        except ValueError as e:
+            pass
 
-        typer.echo(" ".join((str(x) for x in ids)), err=False)  # stdout for piping
-    else:
-        typer.secho(f"-E- Invalid command {cmd}", err=True)
+        # with command letter
+        cmd = str(selection[0])
+        selection = [int(x) for x in selection[1:]]
+        ids = list()
+        if cmd == "p":
+            if len(selection) == 0:
+                ids = [bm.id for bm in bms]
+            else:
+                for i in selection:
+                    ids.append(bms[i].id)
+
+            typer.echo(",".join((str(x) for x in ids)), err=False)  # stdout for piping
+        else:
+            typer.secho(f"-E- Invalid command {cmd}", err=True)
+    except IndexError as e:
+        typer.secho(f"-E- Selected index {selection} out of range.", err=True, fg=typer.colors.RED)
+        raise typer.Abort()
 
 
 @app.command()
@@ -193,14 +197,14 @@ def search(
     Tags must be specified as comma separated list without blanks.
     Correct FTS search syntax: https://www.sqlite.org/fts5.html chapter 3.
 
-    Examples:\n
-    twbm search 'security "single-page"'\n
-    twbm search '"https://securit" *'\n
-    twbm search '^security'\n
-    twbm search 'postgres OR sqlite'\n
-    twbm search 'security NOT keycloak'\n
-    twbm search -t tag1,tag2 -n notag1 <searchquery>\n
-    twbm search xxxxx | twbm update -t x\n
+    Example:\n
+        twbm search 'security "single-page"'\n
+        twbm search '"https://securit" *'\n
+        twbm search '^security'\n
+        twbm search 'postgres OR sqlite'\n
+        twbm search 'security NOT keycloak'\n
+        twbm search -t tag1,tag2 -n notag1 <searchquery>\n
+        twbm search xxxxx | twbm update -t x\n
     """
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
@@ -253,33 +257,45 @@ def delete(
 @app.command()
 def update(
         # ctx: typer.Context,
-        input_: str = typer.Argument(None, help="tags, comma seperated list, no blanks"),
-        tags: str = typer.Option("", "-t", "--tags", help="add taglist to tags"),
-        tags_not: str = typer.Option("", "-n", "--tags", help="remove taglist from tags"),
+        ids: str = typer.Argument(None, help="list of ids, separated by comma, no blanks"),
+        tags: str = typer.Option(None, "-t", "--tags", help="add tags to taglist"),
+        tags_not: str = typer.Option(None, "-n", "--tags", help="remove tags from taglist"),
         force: bool = typer.Option(
-            False, "-f", "--force", help="overwrite tags with taglist"
+            False, "-f", "--force", help="overwrite taglist with tags"
         ),
         verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
+    """
+    Updates bookmarks with tags, either removes tags, add tags or overwrites entire taglist.
+
+    Gotcha: in order to allow for piped input, ids must be separated by comma with no blanks.
+
+    Example for using piped input:
+
+        twbm search xxxxx | twbm update -t <tag>
+    """
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
-    tags_ = tags.lower().replace(" ", "").split(",")
-    tags_not_ = tags_not.lower().replace(" ", "").split(",")
+    if tags is not None:
+        tags = tags.lower().replace(" ", "").split(",")
+    if tags_not is not None:
+        tags_not = tags_not.lower().replace(" ", "").split(",")
 
     # Gotcha: running from IDE looks like pipe
     is_pipe = not isatty(sys.stdin.fileno())
-    ids: Sequence[int] = list()
+    ids_: Sequence[int] = list()
 
     if is_pipe:
-        input_ = sys.stdin.readline()
+        ids = sys.stdin.readline()
 
     try:
-        ids = [int(x) for x in input_.split()]
+        ids = [int(x.strip()) for x in ids.split(',')]
     except ValueError as e:
         typer.secho(f"-E- Wrong input format.", color=typer.colors.RED, err=True)
         raise typer.Abort()
 
-    _update_tags(ids, tags_, tags_not_, force=force)
+    print(ids)
+    _update_tags(ids, tags, tags_not, force=force)
 
 
 @app.command()
@@ -300,6 +316,7 @@ def add(
     Provide URL (required) and tags (optional) as parameters.
 
     Example:
+
         twbm add https://www.google.com tag1, tag2 --title "<title>"
     """
     if verbose:
