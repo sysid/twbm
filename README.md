@@ -113,6 +113,4 @@ diff buku.py buku
 `make test`
 
 ## Roadmap
-- allow piping between twbm: `bb <word> | bb -t newtag`
-- full help
-- database creation
+- tbd
