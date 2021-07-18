@@ -15,11 +15,10 @@ If you are happy using [buku](https://github.com/jarun/buku), by all means stick
 However, there is no risk in trying [twbm](https://github.com/sysid/twbm). twbm is 100% buku compatible.   
 If you do not like it you can go back without loosing your bookmark database.
 
-So why not contribute directly to buku? Because I do not agree with all design decisions (see also
-Architecture) and I had to make too many compromises.
+Why not contribute to buku? Because I do not agree with all design decisions (see also
+Architecture).
 
-To harness `twbm`'s power, you should use the correct FTS search syntax (see: https://www.sqlite.org/fts5.html chapter 3). 
-I did not make efforts to sanitize incorrect user input (see examples).  
+To harness `twbm`'s power, you need to use correct FTS search syntax (see: https://www.sqlite.org/fts5.html chapter 3). 
 
 If you find a bug, please open an issue.
 
@@ -59,11 +58,15 @@ After selecting you are straight back at the bash prompt.
 ```bash
 pipx twbm
 ```
-The database schema needs to be upgraded to allow for FTS indexing:  
+The database schema needs to be upgraded:  
 - To upgrade your existing buku db: `twbm-upgrade-db.sh buku.db twbm.db`.  
 - To downgrade your existing twbm db: `twbm-downgrade-db.sh twbm.db buku.db`.  
 
-You can downgrade any time.
+Your existing bookmark database (`buku.db`) is not changed by the upgrade! Instead, a new database
+with advanced features will be created.
+
+Going back to `buku` is easy: Take the FTS database (`twbm.db`) and create a buku database
+with reduced features (`buku.db`). Again, existing databases are not affected.
 
 Tested configuration:  
 - sqlite 3.28.0 (requires update on macOS)
