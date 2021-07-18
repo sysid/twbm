@@ -399,7 +399,8 @@ def tags(
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
 
-    tag = tag.strip(',').strip().lower()
+    if tag is not None:
+        tag = tag.strip(',').strip().lower()
 
     with DAL(env_config=config) as dal:
         if tag is None:

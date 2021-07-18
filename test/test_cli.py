@@ -50,3 +50,15 @@ class TestAddUrl:
         print(result.stdout)
         assert "Create unknown_tags=['pa', 'pb', 'pz']" in result.stdout
         assert result.exit_code == 1
+
+
+class TestTags:
+    def test_tags(self, dal):
+        result = runner.invoke(app, ["tags", "-v"])
+        print(result.stdout)
+        assert result.exit_code == 0
+
+    def test_tags_related(self, dal):
+        result = runner.invoke(app, ["tags", "-v", "xxx"])
+        print(result.stdout)
+        assert result.exit_code == 0
