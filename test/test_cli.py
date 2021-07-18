@@ -7,31 +7,38 @@ runner = CliRunner()
 
 
 class TestSearch:
-    def test_search_p(self):
+    def test_search_d(self, dal):
+        result = runner.invoke(app, ["search", "-v"], input="d 1 2\n")
+        print(result.stdout)
+        assert result.exit_code == 0
+        assert "Index 2 deleted" in result.stdout
+        assert "Index 1 deleted" in result.stdout
+
+    def test_search_p(self, dal):
         result = runner.invoke(app, ["search", "-v"], input="p 1 2\n")
         print(result.stdout)
         assert result.exit_code == 0
         assert "xxxxx" in result.stdout
 
-    def test_search(self):
+    def test_search(self, dal):
         result = runner.invoke(app, ["search", "-v", "--np", "xxxxx"])
         print(result.stdout)
         assert result.exit_code == 0
         assert "xxxxx" in result.stdout
 
-    def test_search_tags_exact(self):
+    def test_search_tags_exact(self, dal):
         result = runner.invoke(app, ["search", "-v", "--np", "-e", "aaa,bbb"])
         print(result.stdout)
         assert result.exit_code == 0
         assert "Found: 2" in result.stdout
 
-    def test_search_tags_exact_none(self):
+    def test_search_tags_exact_none(self, dal):
         result = runner.invoke(app, ["search", "-v", "--np", "-e", "aaa"])
         print(result.stdout)
         assert result.exit_code == 0
         assert "Found: 0" in result.stdout
 
-    def test_search_tags_exact_invalid(self):
+    def test_search_tags_exact_invalid(self, dal):
         result = runner.invoke(app, ["search", "-v", "--np", "-e", "aaa,", "bbb"])
         print(result.stdout)
 
@@ -50,19 +57,43 @@ def test_delete(dal):
 
 class TestAddUrl:
     def test_add(self, dal):
-        result = runner.invoke(app, ["add", "--title", "title1", "https://www.google.com"])
+        result = runner.invoke(
+            app, ["add", "--title", "title1", "https://www.google.com"]
+        )
         print(result.stdout)
         assert result.exit_code == 0
 
     def test_add_with_new_tags_yes(self, dal):
-        result = runner.invoke(app, ["add", "--title", "title1", "https://www.google.com", "pa,pb", " pz", "PZ"],
-                               input="y\n")
+        result = runner.invoke(
+            app,
+            [
+                "add",
+                "--title",
+                "title1",
+                "https://www.google.com",
+                "pa,pb",
+                " pz",
+                "PZ",
+            ],
+            input="y\n",
+        )
         print(result.stdout)
         assert result.exit_code == 0
 
     def test_add_with_new_tags_no(self, dal):
-        result = runner.invoke(app, ["add", "--title", "title1", "https://www.google.com", "pa,pb", " pz", "PZ"],
-                               input="n\n")
+        result = runner.invoke(
+            app,
+            [
+                "add",
+                "--title",
+                "title1",
+                "https://www.google.com",
+                "pa,pb",
+                " pz",
+                "PZ",
+            ],
+            input="n\n",
+        )
         print(result.stdout)
         assert "Create unknown_tags=['pa', 'pb', 'pz']" in result.stdout
         assert result.exit_code == 1
