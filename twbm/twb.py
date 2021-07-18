@@ -41,6 +41,10 @@ def parse_tags(tags: Sequence[str]) -> str:
     return f",{','.join(tags)},"
 
 
+def match_exact_tags(tags: Sequence, bm_tags: Sequence) -> bool:
+    return set(bm_tags) == set(tags)
+
+
 def match_all_tags(tags: Sequence, bm_tags: Sequence) -> bool:
     return (set(bm_tags) & set(tags)) == set(tags)
 
@@ -81,6 +85,7 @@ def _update_tags(
             dal.update_bookmark(bm)
 
 
+
 class Bookmarks:
     bms: Sequence[Bookmark]
 
@@ -108,6 +113,16 @@ class Bookmarks:
             filtered = [bm for bm in bms if not match_any_tag(tags, bm.split_tags)]
         else:
             filtered = [bm for bm in bms if match_any_tag(tags, bm.split_tags)]
+        return filtered
+
+    @staticmethod
+    def match_exact(
+            tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
+    ) -> Sequence[Bookmark]:
+        if not_:
+            filtered = [bm for bm in bms if not match_exact_tags(tags, bm.split_tags)]
+        else:
+            filtered = [bm for bm in bms if match_exact_tags(tags, bm.split_tags)]
         return filtered
 
 
@@ -171,17 +186,20 @@ def process(bms: Sequence[Bookmark]):
 def search(
         # ctx: typer.Context,
         fts_query: str = typer.Argument("", help="FTS query"),
+        tags_exact: str = typer.Option(
+            None, "-e", "--exact", help="match exact, comma separated list"
+        ),
         tags_all: str = typer.Option(
-            "", "-t", "--tags", help="match all, comma separated list"
+            None, "-t", "--tags", help="match all, comma separated list"
         ),
         tags_any: str = typer.Option(
-            "", "-T", "--Tags", help="match any, comma separated list"
+            None, "-T", "--Tags", help="match any, comma separated list"
         ),
         tags_all_not: str = typer.Option(
-            "", "-n", "--ntags", help="not match all, comma separated list"
+            None, "-n", "--ntags", help="not match all, comma separated list"
         ),
         tags_any_not: str = typer.Option(
-            "", "-N", "--Ntags", help="not match any, comma separated list"
+            None, "-N", "--Ntags", help="not match any, comma separated list"
         ),
         non_interactive: bool = typer.Option(
             False, "--np", help="no prompt"
@@ -204,37 +222,53 @@ def search(
         twbm search 'postgres OR sqlite'\n
         twbm search 'security NOT keycloak'\n
         twbm search -t tag1,tag2 -n notag1 <searchquery>\n
+        twbm search -e tag1,tag2\n
         twbm search xxxxx | twbm update -t x\n
     """
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
-    tags_all_ = tags_all.lower().replace(" ", "").split(",")
-    tags_any_ = tags_any.lower().replace(" ", "").split(",")
-    tags_all_not_ = tags_all_not.lower().replace(" ", "").split(",")
-    tags_any_not_ = tags_any_not.lower().replace(" ", "").split(",")
+
+    tags_all_ = normalize_tag_string(tags_all)
+    tags_any_ = normalize_tag_string(tags_any)
+    tags_all_not_ = normalize_tag_string(tags_all_not)
+    tags_any_not_ = normalize_tag_string(tags_any_not)
+    tags_exact_ = normalize_tag_string(tags_exact)
 
     # generate FTS full list for further tag filtering
     bms = Bookmarks(fts_query=fts_query).bms
 
-    # 1. select viable
-    if tags_all != "":
-        bms = Bookmarks.match_all(tags_all_, bms)
+    # 0. over-rule
+    if tags_exact is not None:
+        bms = Bookmarks.match_exact(tags_exact_, bms)
+    else:
+        # 1. select viable
+        if tags_all is not None:
+            bms = Bookmarks.match_all(tags_all_, bms)
 
-    if tags_any != "":
-        bms = Bookmarks.match_any(tags_any_, bms)
+        if tags_any is not None:
+            bms = Bookmarks.match_any(tags_any_, bms)
 
-    # 2. narrow down
-    if tags_any_not != "":
-        bms = Bookmarks.match_any(tags_any_not_, bms, not_=True)
+        # 2. narrow down
+        if tags_any_not is not None:
+            bms = Bookmarks.match_any(tags_any_not_, bms, not_=True)
 
-    if tags_all_not != "":
-        bms = Bookmarks.match_all(tags_all_not_, bms, not_=True)
+        if tags_all_not is not None:
+            bms = Bookmarks.match_all(tags_all_not_, bms, not_=True)
 
     show_bms(bms)
     typer.echo(f"Found: {len(bms)}", err=True)
 
     if not non_interactive:
         process(bms)
+
+
+def normalize_tag_string(tag_string: str = None) -> Sequence[str]:
+    if tag_string is None:
+        tags_ = tuple()
+    else:
+        tags_ = tag_string.lower().replace(" ", "").split(",")
+        tags_ = sorted(tag for tag in tags_ if tag != '')
+    return tags_
 
 
 @app.command()

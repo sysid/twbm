@@ -6,18 +6,34 @@ from twbm import app
 runner = CliRunner()
 
 
-def test_search_p():
-    result = runner.invoke(app, ["search", "-v"], input="p 1 2\n")
-    print(result.stdout)
-    assert result.exit_code == 0
-    assert "xxxxx" in result.stdout
+class TestSearch:
+    def test_search_p(self):
+        result = runner.invoke(app, ["search", "-v"], input="p 1 2\n")
+        print(result.stdout)
+        assert result.exit_code == 0
+        assert "xxxxx" in result.stdout
 
+    def test_search(self):
+        result = runner.invoke(app, ["search", "-v", "--np", "xxxxx"])
+        print(result.stdout)
+        assert result.exit_code == 0
+        assert "xxxxx" in result.stdout
 
-def test_search():
-    result = runner.invoke(app, ["search", "-v", "--np", "xxxxx"])
-    print(result.stdout)
-    assert result.exit_code == 0
-    assert "xxxxx" in result.stdout
+    def test_search_tags_exact(self):
+        result = runner.invoke(app, ["search", "-v", "--np", "-e", "aaa,bbb"])
+        print(result.stdout)
+        assert result.exit_code == 0
+        assert "Found: 2" in result.stdout
+
+    def test_search_tags_exact_none(self):
+        result = runner.invoke(app, ["search", "-v", "--np", "-e", "aaa"])
+        print(result.stdout)
+        assert result.exit_code == 0
+        assert "Found: 0" in result.stdout
+
+    def test_search_tags_exact_invalid(self):
+        result = runner.invoke(app, ["search", "-v", "--np", "-e", "aaa,", "bbb"])
+        print(result.stdout)
 
 
 @pytest.mark.skip("Notnworking: not allowed operations: fileno()")
