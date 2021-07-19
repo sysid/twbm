@@ -223,6 +223,8 @@ def search(
         None, "-N", "--Ntags", help="not match any, comma separated list"
     ),
     non_interactive: bool = typer.Option(False, "--np", help="no prompt"),
+    order_desc: bool = typer.Option(False, "-o", help="order by age, descending."),
+    order_asc: bool = typer.Option(False, "-O", help="order by age, ascending."),
     verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     """
@@ -273,6 +275,14 @@ def search(
 
         if tags_all_not is not None:
             bms = Bookmarks.match_all(tags_all_not_, bms, not_=True)
+
+    # ordering of results
+    if order_desc:
+        bms = sorted(bms, key=lambda bm: bm.last_update_ts)
+    elif order_asc:
+        bms = list(reversed(sorted(bms, key=lambda bm: bm.last_update_ts)))
+    else:
+        bms = sorted(bms, key=lambda bm: bm.metadata.lower())
 
     show_bms(bms)
     typer.echo(f"Found: {len(bms)}", err=True)
