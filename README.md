@@ -43,6 +43,9 @@ twbm search -e tag1,tag2
 
 # Search -> select interactively -> pipe bookmark id downstream for processing
 twbm search xxxxx | twbm update -t x
+
+# Search by any tag and sort by bookmark age ascending
+twbm search -T tag1,tag2 -O
 ```
 Taglists must not have blanks and have comma separator.
 

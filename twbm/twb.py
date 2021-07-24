@@ -5,15 +5,14 @@ import webbrowser
 from os import isatty
 from typing import Sequence, List
 
+# import for nuitka
+# noinspection PyUnresolvedReferences
+import sqlalchemy.sql.default_comparator
 import typer
 
 from twbm.buku import edit_rec, BukuDb
 from twbm.db.dal import Bookmark, DAL
 from twbm.environment import config
-
-# import for nuitka
-# noinspection PyUnresolvedReferences
-import sqlalchemy.sql.default_comparator
 
 _log = logging.getLogger(__name__)
 log_fmt = r"%(asctime)-15s %(levelname)s %(name)s %(funcName)s:%(lineno)d %(message)s"
@@ -21,7 +20,11 @@ datefmt = "%Y-%m-%d %H:%M:%S"
 logging.basicConfig(format=log_fmt, level=config.log_level, datefmt=datefmt)
 logging.getLogger("urllib3").setLevel(logging.ERROR)
 
-app = typer.Typer()
+HELP_DESC = """
+boookmark manager for the command line
+"""
+
+app = typer.Typer(help=HELP_DESC)
 
 fts_sql = """
 -- name: fts
@@ -64,10 +67,10 @@ def check_tags(tags: Sequence[str]) -> Sequence[str]:
 
 
 def _update_tags(
-    ids: Sequence[int],
-    tags: Sequence[str] = None,
-    tags_not: Sequence[str] = None,
-    force: bool = False,
+        ids: Sequence[int],
+        tags: Sequence[str] = None,
+        tags_not: Sequence[str] = None,
+        force: bool = False,
 ):
     bms = Bookmarks(fts_query="").bms
     if tags is None:
@@ -100,7 +103,7 @@ class Bookmarks:
 
     @staticmethod
     def match_all(
-        tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
+            tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
     ) -> Sequence[Bookmark]:
         if not_:
             filtered = [bm for bm in bms if not match_all_tags(tags, bm.split_tags)]
@@ -110,7 +113,7 @@ class Bookmarks:
 
     @staticmethod
     def match_any(
-        tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
+            tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
     ) -> Sequence[Bookmark]:
         if not_:
             filtered = [bm for bm in bms if not match_any_tag(tags, bm.split_tags)]
@@ -120,7 +123,7 @@ class Bookmarks:
 
     @staticmethod
     def match_exact(
-        tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
+            tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
     ) -> Sequence[Bookmark]:
         if not_:
             filtered = [bm for bm in bms if not match_exact_tags(tags, bm.split_tags)]
@@ -154,6 +157,13 @@ def show_bms(bms: Sequence[Bookmark], err: bool = True):
 
 
 def process(bms: Sequence[Bookmark]):
+    help_text = """
+        <n1> <n2>:      opens selection in browser
+        p <n1> <n2>:    print id-list of selection
+        p:              print all ids
+        d <n1> <n2>:    delete selection
+        h:              help
+    """
     typer.secho(f"Selection: ", fg=typer.colors.GREEN, err=True)
     selection = [x for x in input().split()]
 
@@ -186,7 +196,7 @@ def process(bms: Sequence[Bookmark]):
                 raise typer.Exit()
             else:
                 for id_ in reversed(
-                    selection
+                        selection
                 ):  # must be reversed because of compacting
                     print(id_)
                     _ = BukuDb(dbfile=config.dbfile).delete_rec(
@@ -195,12 +205,14 @@ def process(bms: Sequence[Bookmark]):
                     typer.echo(
                         f"-M- Deleted entry: {bms[id_].metadata}: {bms[id_].URL}"
                     )
-
+        elif cmd == "h":
+            typer.echo(help_text, err=True)
         else:
-            typer.secho(f"-E- Invalid command {cmd}", err=True)
+            typer.secho(f"-E- Invalid command {cmd}\n", err=True)
+            typer.echo(help_text, err=True)
     except IndexError as e:
         typer.secho(
-            f"-E- Selected index {selection} out of range.",
+            f"-E- Selection {selection} out of range.",
             err=True,
             fg=typer.colors.RED,
         )
@@ -209,27 +221,27 @@ def process(bms: Sequence[Bookmark]):
 
 @app.command()
 def search(
-    # ctx: typer.Context,
-    fts_query: str = typer.Argument("", help="FTS query"),
-    tags_exact: str = typer.Option(
-        None, "-e", "--exact", help="match exact, comma separated list"
-    ),
-    tags_all: str = typer.Option(
-        None, "-t", "--tags", help="match all, comma separated list"
-    ),
-    tags_any: str = typer.Option(
-        None, "-T", "--Tags", help="match any, comma separated list"
-    ),
-    tags_all_not: str = typer.Option(
-        None, "-n", "--ntags", help="not match all, comma separated list"
-    ),
-    tags_any_not: str = typer.Option(
-        None, "-N", "--Ntags", help="not match any, comma separated list"
-    ),
-    non_interactive: bool = typer.Option(False, "--np", help="no prompt"),
-    order_desc: bool = typer.Option(False, "-o", help="order by age, descending."),
-    order_asc: bool = typer.Option(False, "-O", help="order by age, ascending."),
-    verbose: bool = typer.Option(False, "-v", "--verbose"),
+        # ctx: typer.Context,
+        fts_query: str = typer.Argument("", help="FTS query"),
+        tags_exact: str = typer.Option(
+            None, "-e", "--exact", help="match exact, comma separated list"
+        ),
+        tags_all: str = typer.Option(
+            None, "-t", "--tags", help="match all, comma separated list"
+        ),
+        tags_any: str = typer.Option(
+            None, "-T", "--Tags", help="match any, comma separated list"
+        ),
+        tags_all_not: str = typer.Option(
+            None, "-n", "--ntags", help="not match all, comma separated list"
+        ),
+        tags_any_not: str = typer.Option(
+            None, "-N", "--Ntags", help="not match any, comma separated list"
+        ),
+        non_interactive: bool = typer.Option(False, "--np", help="no prompt"),
+        order_desc: bool = typer.Option(False, "-o", help="order by age, descending."),
+        order_asc: bool = typer.Option(False, "-O", help="order by age, ascending."),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     """
     Searches bookmark database with full text search capabilities (FTS)
@@ -248,7 +260,18 @@ def search(
         twbm search 'security NOT keycloak'\n
         twbm search -t tag1,tag2 -n notag1 <searchquery>\n
         twbm search -e tag1,tag2\n
-        twbm search xxxxx | twbm update -t x\n
+        twbm search xxxxx | twbm update -t x (interactive selection)\n
+
+    \nCommands in interactive mode:\n
+        <n1> <n2>:      opens selection in browser\n
+        p <n1> <n1>:    prints corresponding id-list of selection\n
+        p:              prints all ids\n
+        d <n1> <n1>:    delete selection\n
+
+            p <n1> <n2>:    print id-list of selection
+            p:              print all ids
+            d <n1> <n2>:    delete selection
+            h:              help
     """
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
@@ -306,31 +329,30 @@ def normalize_tag_string(tag_string: str = None) -> Sequence[str]:
 
 @app.command()
 def delete(
-    # ctx: typer.Context,
-    id_: int = typer.Argument(..., help="id to delete"),
-    verbose: bool = typer.Option(False, "-v", "--verbose"),
+        # ctx: typer.Context,
+        id_: int = typer.Argument(..., help="id to delete"),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
 
     # use buku because of DB compactdb
+    with DAL(env_config=config) as dal:
+        bm = dal.get_bookmark_by_id(id_=id_)
+        show_bms((bm,))
     _ = BukuDb(dbfile=config.dbfile).delete_rec(index=id_, delay_commit=False)
-
-    # with DAL(env_config=config) as dal:
-    #     result = dal.delete_bookmark(id=id_)
-    #     typer.echo(f"Deleted index: {result}")
 
 
 @app.command()
 def update(
-    # ctx: typer.Context,
-    ids: str = typer.Argument(None, help="list of ids, separated by comma, no blanks"),
-    tags: str = typer.Option(None, "-t", "--tags", help="add tags to taglist"),
-    tags_not: str = typer.Option(None, "-n", "--tags", help="remove tags from taglist"),
-    force: bool = typer.Option(
-        False, "-f", "--force", help="overwrite taglist with tags"
-    ),
-    verbose: bool = typer.Option(False, "-v", "--verbose"),
+        # ctx: typer.Context,
+        ids: str = typer.Argument(None, help="list of ids, separated by comma, no blanks"),
+        tags: str = typer.Option(None, "-t", "--tags", help="add tags to taglist"),
+        tags_not: str = typer.Option(None, "-n", "--tags", help="remove tags from taglist"),
+        force: bool = typer.Option(
+            False, "-f", "--force", help="overwrite taglist with tags"
+        ),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     """
     Updates bookmarks with tags, either removes tags, add tags or overwrites entire taglist.
@@ -367,15 +389,15 @@ def update(
 
 @app.command()
 def add(
-    # ctx: typer.Context,
-    url_data: List[str] = typer.Argument(..., help="URL and tags"),
-    title: str = typer.Option("", "--title"),
-    desc: str = typer.Option("", "-d", "--desc"),
-    edit: bool = typer.Option(False, "-e", "--edit", help="open in editor"),
-    verbose: bool = typer.Option(False, "-v", "--verbose"),
-    nofetch: bool = typer.Option(
-        False, "-f", "--nofetch", help="do not try to fetch metadata from web"
-    ),
+        # ctx: typer.Context,
+        url_data: List[str] = typer.Argument(..., help="URL and tags"),
+        title: str = typer.Option("", "--title"),
+        desc: str = typer.Option("", "-d", "--desc"),
+        edit: bool = typer.Option(False, "-e", "--edit", help="open in editor"),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
+        nofetch: bool = typer.Option(
+            False, "-f", "--nofetch", help="do not try to fetch metadata from web"
+        ),
 ):
     """
     Adds booksmarks to database and FTS index.
@@ -426,23 +448,27 @@ def add(
 
 @app.command()
 def show(
-    # ctx: typer.Context,
-    id_: int = typer.Argument(..., help="id to print"),
-    verbose: bool = typer.Option(False, "-v", "--verbose"),
+        # ctx: typer.Context,
+        id_: int = typer.Argument(..., help="id to print"),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
-    _ = BukuDb(dbfile=config.dbfile).print_rec(index=id_)
+
+    # _ = BukuDb(dbfile=config.dbfile).print_rec(index=id_)
+    with DAL(env_config=config) as dal:
+        bm = dal.get_bookmark_by_id(id_=id_)
+        show_bms((bm,))
 
 
 @app.command()
 def edit(
-    # ctx: typer.Context,
-    id_: int = typer.Argument(..., help="id to edit"),
-    verbose: bool = typer.Option(False, "-v", "--verbose"),
-    nofetch: bool = typer.Option(
-        False, "-f", "--nofetch", help="do not try to fetch metadata from web"
-    ),
+        # ctx: typer.Context,
+        id_: int = typer.Argument(..., help="id to edit"),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
+        nofetch: bool = typer.Option(
+            False, "-f", "--nofetch", help="do not try to fetch metadata from web"
+        ),
 ):
     immutable = -1 if nofetch else 1
     if verbose:
@@ -452,12 +478,12 @@ def edit(
 
 @app.command()
 def tags(
-    # ctx: typer.Context,
-    tag: str = typer.Argument(
-        None,
-        help="tag for which related tags should be shown. No input: all tags are printed.",
-    ),
-    verbose: bool = typer.Option(False, "-v", "--verbose"),
+        # ctx: typer.Context,
+        tag: str = typer.Argument(
+            None,
+            help="tag for which related tags should be shown. No input: all tags are printed.",
+        ),
+        verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     """
     No parameter: Show all tags
