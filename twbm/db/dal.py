@@ -124,6 +124,27 @@ class DAL:
         self.conn.connection.commit()
         return result
 
+    def get_bookmark_by_id(self, id_: int) -> Bookmark:
+        # Example query
+        # noinspection SqlResolve
+        query = """
+            -- name: get_bookmark_by_id^
+            -- record_class: Bookmark
+            select *
+            from bookmarks
+            where id = :id;
+            """
+        queries = aiosql.from_str(
+            query, "sqlite3", record_classes=self.record_classes
+        )
+        sql_result = queries.get_bookmark_by_id(
+            self.conn.connection, id=id_
+        )
+        if not sql_result:
+            # noinspection PyRedundantParentheses
+            return Bookmark()
+        return sql_result
+
     def get_bookmarks(self, fts_query: str) -> Sequence[Bookmark]:
         # Example query
         # noinspection SqlResolve

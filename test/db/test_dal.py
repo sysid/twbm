@@ -29,6 +29,12 @@ def test_get_bookmarks(dal):
     assert isinstance(results[0], Bookmark)
 
 
+def test_get_bookmark_by_id(dal):
+    bm = dal.get_bookmark_by_id(id_=1)
+    assert isinstance(bm, Bookmark)
+    assert bm.id == 1
+
+
 def test_get_bookmarks_via_fts(dal):
     bms = dal.get_bookmarks(fts_query="aaa")
     assert len(bms) == 1
