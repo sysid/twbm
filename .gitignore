@@ -1,3 +1,5 @@
+twb.bin
+twb.build
 .idea/workspace.xml
 *.db
 .env

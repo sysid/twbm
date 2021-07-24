@@ -11,6 +11,10 @@ from twbm.buku import edit_rec, BukuDb
 from twbm.db.dal import Bookmark, DAL
 from twbm.environment import config
 
+# import for nuitka
+# noinspection PyUnresolvedReferences
+import sqlalchemy.sql.default_comparator
+
 _log = logging.getLogger(__name__)
 log_fmt = r"%(asctime)-15s %(levelname)s %(name)s %(funcName)s:%(lineno)d %(message)s"
 datefmt = "%Y-%m-%d %H:%M:%S"
@@ -432,9 +436,9 @@ def show(
 
 
 @app.command()
-def write(
+def edit(
     # ctx: typer.Context,
-    id_: int = typer.Argument(..., help="id to print"),
+    id_: int = typer.Argument(..., help="id to edit"),
     verbose: bool = typer.Option(False, "-v", "--verbose"),
     nofetch: bool = typer.Option(
         False, "-f", "--nofetch", help="do not try to fetch metadata from web"
