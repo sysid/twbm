@@ -1,8 +1,10 @@
 # twbm: Bookmarks via Commandline (CLI)
 
+[sysid blog: twbm](https://sysid.github.io/twbm/)
+
 Inspired by https://github.com/jarun/buku.
 
-Why not just use it directly?
+Why not just use buku?
 
 - better full-text search.
 - check tags for consistency when adding new bookmark
@@ -19,9 +21,9 @@ To harness `twbm`'s power, use correct FTS search syntax (see: https://www.sqlit
 ## Usage
 Two complementary commands are provided:
 1. **twbm**: CLI tool with FTS for bookmark management
-2. **twbuku**: plain buku with small enhancements and usage of an enhanced database
+2. **twbuku**: 100% buku with small enhancements and usage of an enhanced database
 
-This allows to use the battle-tested buku interface where applicable and benefit from additional features 
+This allows to use the battle-tested buku interface where preferred and still benefit from additional features 
 while using one enhanced bookmark database.
 
 Getting help: `twbm --help`
