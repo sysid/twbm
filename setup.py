@@ -57,6 +57,7 @@ setup(
         "alembic",
         "typer",
         "pydantic[dotenv]",
+        "aiosql",
     ],
     scripts=["scripts/twbm-downgrade-db.sh", "scripts/twbm-upgrade-db.sh"],
     classifiers=[

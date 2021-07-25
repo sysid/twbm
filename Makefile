@@ -8,16 +8,21 @@ VERSION       = $(shell cat twbm/__init__.py | grep __version__ | sed "s/__versi
 
 .DEFAULT_GOAL := help
 
-# Put it first so that "make" without argument is like "make help".
-#help:
-#	@echo "$(MAKE) [all,clean,build,upload,test,black,install,uninstall]"
-#default: all
+isort = isort --multi-line=3 --trailing-comma --force-grid-wrap=0 --combine-as --line-width 88 $(pkg_src) $(tests_src)
+black = black $(pkg_src) $(tests_src)
+tox = tox
+mypy = mypy $(pkg_src)
+pipenv = pipenv
 
 .PHONY: all
 all: clean build upload tag
 	@echo "--------------------------------------------------------------------------------"
 	@echo "-M- building and distributing"
 	@echo "--------------------------------------------------------------------------------"
+
+.PHONY: tox
+tox:   ## Run tox
+	$(tox)
 
 .PHONY: test
 test:  ## run tests

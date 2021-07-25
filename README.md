@@ -1,5 +1,10 @@
 # twbm: Bookmarks via Commandline (CLI)
 
+[![PyPI Version][pypi-image]][pypi-url]
+[![Build Status][build-image]][build-url]
+[![Code Coverage][coverage-image]][coverage-url]
+
+
 [sysid blog: twbm](https://sysid.github.io/twbm/)
 
 Inspired by https://github.com/jarun/buku.
@@ -112,3 +117,13 @@ diff buku.py buku
 
 ## Roadmap
 - tbd
+
+<!-- Badges -->
+[pypi-image]: https://img.shields.io/pypi/v/twbm?color=blue
+[pypi-url]: https://pypi.org/project/twbm/
+[build-image]: https://github.com/sysid/twbm/actions/workflows/build.yml/badge.svg
+[build-url]: https://github.com/sysid/twbm/actions/workflows/build.yml
+[coverage-image]: https://codecov.io/gh/sysid/twbm/branch/main/graph/badge.svg
+[coverage-url]: https://codecov.io/gh/sysid/twbm
+[quality-image]: https://api.codeclimate.com/v1/badges/3130fa0ba3b7993fbf0a/maintainability
+[quality-url]: https://codeclimate.com/github/nalgeon/podsearch-py
