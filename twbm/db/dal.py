@@ -116,8 +116,7 @@ class DAL:
             update bookmarks
             set tags = :tags
             where id = :id
-            returning *
-            ;
+            returning *;
         """
         queries = aiosql.from_str(query, "sqlite3")
         result = queries.update_bookmark(self.conn.connection, id=bm.id, tags=bm.tags)
@@ -134,12 +133,8 @@ class DAL:
             from bookmarks
             where id = :id;
             """
-        queries = aiosql.from_str(
-            query, "sqlite3", record_classes=self.record_classes
-        )
-        sql_result = queries.get_bookmark_by_id(
-            self.conn.connection, id=id_
-        )
+        queries = aiosql.from_str(query, "sqlite3", record_classes=self.record_classes)
+        sql_result = queries.get_bookmark_by_id(self.conn.connection, id=id_)
         if not sql_result:
             # noinspection PyRedundantParentheses
             return Bookmark()

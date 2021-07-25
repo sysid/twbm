@@ -8,16 +8,21 @@ VERSION       = $(shell cat twbm/__init__.py | grep __version__ | sed "s/__versi
 
 .DEFAULT_GOAL := help
 
-# Put it first so that "make" without argument is like "make help".
-#help:
-#	@echo "$(MAKE) [all,clean,build,upload,test,black,install,uninstall]"
-#default: all
+isort = isort --multi-line=3 --trailing-comma --force-grid-wrap=0 --combine-as --line-width 88 $(pkg_src) $(tests_src)
+black = black $(pkg_src) $(tests_src)
+tox = tox
+mypy = mypy $(pkg_src)
+pipenv = pipenv
 
 .PHONY: all
 all: clean build upload tag
 	@echo "--------------------------------------------------------------------------------"
 	@echo "-M- building and distributing"
 	@echo "--------------------------------------------------------------------------------"
+
+.PHONY: tox
+tox:   ## Run tox
+	$(tox)
 
 .PHONY: test
 test:  ## run tests
@@ -27,6 +32,17 @@ test:  ## run tests
 .PHONY: test-shell
 test-shell:  ## run tests
 	./scripts/test-pipe.sh
+
+.PHONY: coverage
+coverage:  ## Run tests with coverage
+	python -m coverage erase
+	#python -m coverage run --include=$(pkg_src)/* --omit="$(pkg_src)/text.py" -m pytest -ra
+	TWBM_DB_URL=sqlite:///test/tests_data/bm_test.db python -m coverage run --include=$(pkg_src)/* -m pytest -ra
+	#python -m coverage report -m
+	python -m coverage html
+	python -m coverage report -m
+	python -m coverage xml
+	open htmlcov/index.html  # work on macOS
 
 .PHONY: clean
 clean:  ## remove ./dist
@@ -40,7 +56,8 @@ build:  ## build
 #	git add .
 #	git commit
 #	git push
-	python setup.py sdist
+	#python setup.py sdist
+	python -m build
 
 .PHONY: upload
 upload:  ## upload to PyPi
@@ -65,7 +82,7 @@ init-db:  ## copy prod db to sql/bm.db and clean
 
 
 .PHONY: install
-install: uninstall clean build  ## pipx install
+install: clean build  ## pipx install
 	pipx install $(HOME)/dev/py/twbm
 
 .PHONY: uninstall

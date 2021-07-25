@@ -11,6 +11,7 @@ scandir = "*"
 pyyaml = "*"
 mock = "*"
 nuitka = "*"
+build = "*"
 
 [packages]
 # bookmarks-parser = "*"
