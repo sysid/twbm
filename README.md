@@ -72,7 +72,7 @@ Database schema upgrade:
 All transactions do not affect existing databases.
 
 Tested configuration:  
-- sqlite 3.28.0 (requires update on macOS)
+- sqlite 3.36.0 (requires update on macOS)
 - macOS 10.15.7
 
 ## Configuration

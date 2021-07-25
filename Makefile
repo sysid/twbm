@@ -45,7 +45,8 @@ build:  ## build
 #	git add .
 #	git commit
 #	git push
-	python setup.py sdist
+	#python setup.py sdist
+	python -m build
 
 .PHONY: upload
 upload:  ## upload to PyPi
@@ -70,7 +71,7 @@ init-db:  ## copy prod db to sql/bm.db and clean
 
 
 .PHONY: install
-install: uninstall clean build  ## pipx install
+install: clean build  ## pipx install
 	pipx install $(HOME)/dev/py/twbm
 
 .PHONY: uninstall
