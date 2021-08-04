@@ -388,6 +388,45 @@ def update(
 
 
 @app.command()
+def open(
+    # ctx: typer.Context,
+    ids: str = typer.Argument(None, help="list of ids, separated by comma, no blanks"),
+    verbose: bool = typer.Option(False, "-v", "--verbose"),
+):
+    """
+    Opens bookmarks
+
+    Gotcha: in order to allow for piped input, ids must be separated by comma with no blanks.
+
+    Example for using piped input:
+
+        twbm search xxxxx | twbm open
+    """
+    if verbose:
+        typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
+
+    # Gotcha: running from IDE looks like pipe
+    is_pipe = not isatty(sys.stdin.fileno())
+    ids_: Sequence[int] = list()
+
+    if is_pipe:
+        ids = sys.stdin.readline()
+
+    try:
+        ids = [int(x.strip()) for x in ids.split(",")]
+    except ValueError as e:
+        typer.secho(f"-E- Wrong input format.", color=typer.colors.RED, err=True)
+        raise typer.Abort()
+
+    print(ids)
+    with DAL(env_config=config) as dal:
+        for id_ in ids:
+            bm = dal.get_bookmark_by_id(id_=id_)
+            show_bms((bm,))
+            webbrowser.open(bm.URL, new=2)
+
+
+@app.command()
 def add(
     # ctx: typer.Context,
     url_data: List[str] = typer.Argument(..., help="URL and tags"),

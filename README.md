@@ -112,6 +112,10 @@ diff buku.py buku
 ## Testing
 `make test`
 
+### Piping
+Pycharm run configuration interferes with piping. Testing/Running only possible on CLI.
+This affects the following commands: `open, update`
+
 ## Roadmap
 - tbd
 
