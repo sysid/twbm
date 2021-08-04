@@ -42,6 +42,18 @@ class TestSearch:
         result = runner.invoke(app, ["search", "-v", "--np", "-e", "aaa,", "bbb"])
         print(result.stdout)
 
+    def test_search_docs(self, dal):
+        result = runner.invoke(app, ["docs", "-v"], input="1 2\n")
+        print(result.stdout)
+        assert result.exit_code == 1
+        assert "out of range" in result.stdout
+
+    @pytest.mark.skip("Interactive Tests.")
+    def test_search_browser_should_open(self, dal):
+        result = runner.invoke(app, ["search", "-v"], input="1 2\n")
+        print(result.stdout)
+        assert result.exit_code == 1
+
 
 @pytest.mark.skip("Notnworking: not allowed operations: fileno()")
 def test_upgrade(dal):
