@@ -463,12 +463,16 @@ def docs(
 ):
     """
     Searches bookmark database analog 'search' command and filters additonally for
-    tag 'doc'. Opens the results in browser.
+    tag 'doc'. Opens the results in browser unless -i is specified.
     """
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
 
-    tags_all = f"{tags_all},doc"
+    if tags_all is None:
+        tags_all = "doc"
+    else:
+        tags_all = f"{tags_all},doc"
+    print(tags_all)
     bms = Bookmarks(fts_query=fts_query).filter(
         tags_all, tags_all_not, tags_any, tags_any_not, tags_exact
     )
@@ -477,10 +481,10 @@ def docs(
     typer.echo(f"Found: {len(bms)}", err=True)
 
     if interactive:
+        process(bms)
+    else:
         for bm in bms:
             webbrowser.open(bm.URL, new=2)
-    else:
-        process(bms)
 
 
 if __name__ == "__main__":

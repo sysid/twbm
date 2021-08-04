@@ -82,7 +82,7 @@ init-db:  ## copy prod db to sql/bm.db and clean
 
 
 .PHONY: install
-install: clean build  ## pipx install
+install: clean build uninstall ## pipx install
 	pipx install $(HOME)/dev/py/twbm
 
 .PHONY: uninstall
