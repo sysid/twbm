@@ -10,6 +10,7 @@ from typing import Sequence, List
 import sqlalchemy.sql.default_comparator
 import typer
 
+from twbm.bookmarks import Bookmarks, clean_tags, parse_tags, check_tags
 from twbm.buku import edit_rec, BukuDb
 from twbm.db.dal import Bookmark, DAL
 from twbm.environment import config
@@ -32,45 +33,11 @@ fts_sql = """
 """
 
 
-def clean_tags(raw_tags: Sequence[str]) -> Sequence[str]:
-    tags = set()
-    tags_ = set(tag.strip().strip(",").lower() for tag in raw_tags)
-    for tag in tags_:
-        tags__ = set(t for t in tag.split(",") if t != ",")
-        tags |= tags__
-    tags = sorted(tags)
-    _log.debug(f"cleaned tags: {tags}")
-    return tags
-
-
-def parse_tags(tags: Sequence[str]) -> str:
-    tags = sorted(set((tag.lower().strip() for tag in tags)))
-    return f",{','.join(tags)},"
-
-
-def match_exact_tags(tags: Sequence, bm_tags: Sequence) -> bool:
-    return set(bm_tags) == set(tags)
-
-
-def match_all_tags(tags: Sequence, bm_tags: Sequence) -> bool:
-    return (set(bm_tags) & set(tags)) == set(tags)
-
-
-def match_any_tag(tags: Sequence, bm_tags: Sequence) -> bool:
-    return len(set(bm_tags) & set(tags)) > 0
-
-
-def check_tags(tags: Sequence[str]) -> Sequence[str]:
-    with DAL(env_config=config) as dal:
-        all_tags = set(dal.get_all_tags())
-        return sorted((set(tags) - all_tags))
-
-
 def _update_tags(
-        ids: Sequence[int],
-        tags: Sequence[str] = None,
-        tags_not: Sequence[str] = None,
-        force: bool = False,
+    ids: Sequence[int],
+    tags: Sequence[str] = None,
+    tags_not: Sequence[str] = None,
+    force: bool = False,
 ):
     bms = Bookmarks(fts_query="").bms
     if tags is None:
@@ -90,79 +57,6 @@ def _update_tags(
             _log.debug(f"{new_tags=}")
             bm.tags = new_tags
             dal.update_bookmark(bm)
-
-
-class Bookmarks:
-    bms: Sequence[Bookmark]
-
-    def __init__(self, fts_query: str):
-        self.fts_query = fts_query
-
-        with DAL(env_config=config) as dal:
-            self.bms = dal.get_bookmarks(fts_query=fts_query)
-
-    @staticmethod
-    def match_all(
-            tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
-    ) -> Sequence[Bookmark]:
-        if not_:
-            filtered = [bm for bm in bms if not match_all_tags(tags, bm.split_tags)]
-        else:
-            filtered = [bm for bm in bms if match_all_tags(tags, bm.split_tags)]
-        return filtered
-
-    @staticmethod
-    def match_any(
-            tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
-    ) -> Sequence[Bookmark]:
-        if not_:
-            filtered = [bm for bm in bms if not match_any_tag(tags, bm.split_tags)]
-        else:
-            filtered = [bm for bm in bms if match_any_tag(tags, bm.split_tags)]
-        return filtered
-
-    @staticmethod
-    def match_exact(
-            tags: Sequence[str], bms: Sequence[Bookmark], not_: bool = False
-    ) -> Sequence[Bookmark]:
-        if not_:
-            filtered = [bm for bm in bms if not match_exact_tags(tags, bm.split_tags)]
-        else:
-            filtered = [bm for bm in bms if match_exact_tags(tags, bm.split_tags)]
-        return filtered
-
-    def filter(
-            self,
-            tags_all: str = None,
-            tags_all_not: str = None,
-            tags_any: str = None,
-            tags_any_not: str = None,
-            tags_exact: str = None,
-    ):
-        tags_all_ = normalize_tag_string(tags_all)
-        tags_any_ = normalize_tag_string(tags_any)
-        tags_all_not_ = normalize_tag_string(tags_all_not)
-        tags_any_not_ = normalize_tag_string(tags_any_not)
-        tags_exact_ = normalize_tag_string(tags_exact)
-
-        # 0. over-rule
-        if tags_exact is not None:
-            self.bms = Bookmarks.match_exact(tags_exact_, self.bms)
-        else:
-            # 1. select viable
-            if tags_all is not None:
-                self.bms = Bookmarks.match_all(tags_all_, self.bms)
-
-            if tags_any is not None:
-                self.bms = Bookmarks.match_any(tags_any_, self.bms)
-
-            # 2. narrow down
-            if tags_any_not is not None:
-                self.bms = Bookmarks.match_any(tags_any_not_, self.bms, not_=True)
-
-            if tags_all_not is not None:
-                self.bms = Bookmarks.match_all(tags_all_not_, self.bms, not_=True)
-        return self.bms
 
 
 def show_bms(bms: Sequence[Bookmark], err: bool = True):
@@ -229,7 +123,7 @@ def process(bms: Sequence[Bookmark]):
                 raise typer.Exit()
             else:
                 for id_ in reversed(
-                        selection
+                    selection
                 ):  # must be reversed because of compacting
                     print(id_)
                     _ = BukuDb(dbfile=config.dbfile).delete_rec(
@@ -254,27 +148,27 @@ def process(bms: Sequence[Bookmark]):
 
 @app.command()
 def search(
-        # ctx: typer.Context,
-        fts_query: str = typer.Argument("", help="FTS query"),
-        tags_exact: str = typer.Option(
-            None, "-e", "--exact", help="match exact, comma separated list"
-        ),
-        tags_all: str = typer.Option(
-            None, "-t", "--tags", help="match all, comma separated list"
-        ),
-        tags_any: str = typer.Option(
-            None, "-T", "--Tags", help="match any, comma separated list"
-        ),
-        tags_all_not: str = typer.Option(
-            None, "-n", "--ntags", help="not match all, comma separated list"
-        ),
-        tags_any_not: str = typer.Option(
-            None, "-N", "--Ntags", help="not match any, comma separated list"
-        ),
-        non_interactive: bool = typer.Option(False, "--np", help="no prompt"),
-        order_desc: bool = typer.Option(False, "-o", help="order by age, descending."),
-        order_asc: bool = typer.Option(False, "-O", help="order by age, ascending."),
-        verbose: bool = typer.Option(False, "-v", "--verbose"),
+    # ctx: typer.Context,
+    fts_query: str = typer.Argument("", help="FTS query"),
+    tags_exact: str = typer.Option(
+        None, "-e", "--exact", help="match exact, comma separated list"
+    ),
+    tags_all: str = typer.Option(
+        None, "-t", "--tags", help="match all, comma separated list"
+    ),
+    tags_any: str = typer.Option(
+        None, "-T", "--Tags", help="match any, comma separated list"
+    ),
+    tags_all_not: str = typer.Option(
+        None, "-n", "--ntags", help="not match all, comma separated list"
+    ),
+    tags_any_not: str = typer.Option(
+        None, "-N", "--Ntags", help="not match any, comma separated list"
+    ),
+    non_interactive: bool = typer.Option(False, "--np", help="no prompt"),
+    order_desc: bool = typer.Option(False, "-o", help="order by age, descending."),
+    order_asc: bool = typer.Option(False, "-O", help="order by age, ascending."),
+    verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     """
     Searches bookmark database with full text search capabilities (FTS)
@@ -328,20 +222,11 @@ def search(
         process(bms)
 
 
-def normalize_tag_string(tag_string: str = None) -> Sequence[str]:
-    if tag_string is None:
-        tags_ = tuple()
-    else:
-        tags_ = tag_string.lower().replace(" ", "").split(",")
-        tags_ = sorted(tag for tag in tags_ if tag != "")
-    return tags_
-
-
 @app.command()
 def delete(
-        # ctx: typer.Context,
-        id_: int = typer.Argument(..., help="id to delete"),
-        verbose: bool = typer.Option(False, "-v", "--verbose"),
+    # ctx: typer.Context,
+    id_: int = typer.Argument(..., help="id to delete"),
+    verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
@@ -355,14 +240,14 @@ def delete(
 
 @app.command()
 def update(
-        # ctx: typer.Context,
-        ids: str = typer.Argument(None, help="list of ids, separated by comma, no blanks"),
-        tags: str = typer.Option(None, "-t", "--tags", help="add tags to taglist"),
-        tags_not: str = typer.Option(None, "-n", "--tags", help="remove tags from taglist"),
-        force: bool = typer.Option(
-            False, "-f", "--force", help="overwrite taglist with tags"
-        ),
-        verbose: bool = typer.Option(False, "-v", "--verbose"),
+    # ctx: typer.Context,
+    ids: str = typer.Argument(None, help="list of ids, separated by comma, no blanks"),
+    tags: str = typer.Option(None, "-t", "--tags", help="add tags to taglist"),
+    tags_not: str = typer.Option(None, "-n", "--tags", help="remove tags from taglist"),
+    force: bool = typer.Option(
+        False, "-f", "--force", help="overwrite taglist with tags"
+    ),
+    verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     """
     Updates bookmarks with tags, either removes tags, add tags or overwrites entire taglist.
@@ -399,9 +284,9 @@ def update(
 
 @app.command()
 def open(
-        # ctx: typer.Context,
-        ids: str = typer.Argument(None, help="list of ids, separated by comma, no blanks"),
-        verbose: bool = typer.Option(False, "-v", "--verbose"),
+    # ctx: typer.Context,
+    ids: str = typer.Argument(None, help="list of ids, separated by comma, no blanks"),
+    verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     """
     Opens bookmarks
@@ -438,15 +323,15 @@ def open(
 
 @app.command()
 def add(
-        # ctx: typer.Context,
-        url_data: List[str] = typer.Argument(..., help="URL and tags"),
-        title: str = typer.Option("", "--title"),
-        desc: str = typer.Option("", "-d", "--desc"),
-        edit: bool = typer.Option(False, "-e", "--edit", help="open in editor"),
-        verbose: bool = typer.Option(False, "-v", "--verbose"),
-        nofetch: bool = typer.Option(
-            False, "-f", "--nofetch", help="do not try to fetch metadata from web"
-        ),
+    # ctx: typer.Context,
+    url_data: List[str] = typer.Argument(..., help="URL and tags"),
+    title: str = typer.Option("", "--title"),
+    desc: str = typer.Option("", "-d", "--desc"),
+    edit: bool = typer.Option(False, "-e", "--edit", help="open in editor"),
+    verbose: bool = typer.Option(False, "-v", "--verbose"),
+    nofetch: bool = typer.Option(
+        False, "-f", "--nofetch", help="do not try to fetch metadata from web"
+    ),
 ):
     """
     Adds booksmarks to database and FTS index.
@@ -497,9 +382,9 @@ def add(
 
 @app.command()
 def show(
-        # ctx: typer.Context,
-        id_: int = typer.Argument(..., help="id to print"),
-        verbose: bool = typer.Option(False, "-v", "--verbose"),
+    # ctx: typer.Context,
+    id_: int = typer.Argument(..., help="id to print"),
+    verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
@@ -512,12 +397,12 @@ def show(
 
 @app.command()
 def edit(
-        # ctx: typer.Context,
-        id_: int = typer.Argument(..., help="id to edit"),
-        verbose: bool = typer.Option(False, "-v", "--verbose"),
-        nofetch: bool = typer.Option(
-            False, "-f", "--nofetch", help="do not try to fetch metadata from web"
-        ),
+    # ctx: typer.Context,
+    id_: int = typer.Argument(..., help="id to edit"),
+    verbose: bool = typer.Option(False, "-v", "--verbose"),
+    nofetch: bool = typer.Option(
+        False, "-f", "--nofetch", help="do not try to fetch metadata from web"
+    ),
 ):
     immutable = -1 if nofetch else 1
     if verbose:
@@ -527,12 +412,12 @@ def edit(
 
 @app.command()
 def tags(
-        # ctx: typer.Context,
-        tag: str = typer.Argument(
-            None,
-            help="tag for which related tags should be shown. No input: all tags are printed.",
-        ),
-        verbose: bool = typer.Option(False, "-v", "--verbose"),
+    # ctx: typer.Context,
+    tag: str = typer.Argument(
+        None,
+        help="tag for which related tags should be shown. No input: all tags are printed.",
+    ),
+    verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     """
     No parameter: Show all tags
@@ -556,25 +441,25 @@ def tags(
 
 @app.command()
 def docs(
-        # ctx: typer.Context,
-        fts_query: str = typer.Argument("", help="FTS query"),
-        tags_exact: str = typer.Option(
-            None, "-e", "--exact", help="match exact, comma separated list"
-        ),
-        tags_all: str = typer.Option(
-            None, "-t", "--tags", help="match all, comma separated list"
-        ),
-        tags_any: str = typer.Option(
-            None, "-T", "--Tags", help="match any, comma separated list"
-        ),
-        tags_all_not: str = typer.Option(
-            None, "-n", "--ntags", help="not match all, comma separated list"
-        ),
-        tags_any_not: str = typer.Option(
-            None, "-N", "--Ntags", help="not match any, comma separated list"
-        ),
-        interactive: bool = typer.Option(False, "-i", help="interactive selection"),
-        verbose: bool = typer.Option(False, "-v", "--verbose"),
+    # ctx: typer.Context,
+    fts_query: str = typer.Argument("", help="FTS query"),
+    tags_exact: str = typer.Option(
+        None, "-e", "--exact", help="match exact, comma separated list"
+    ),
+    tags_all: str = typer.Option(
+        None, "-t", "--tags", help="match all, comma separated list"
+    ),
+    tags_any: str = typer.Option(
+        None, "-T", "--Tags", help="match any, comma separated list"
+    ),
+    tags_all_not: str = typer.Option(
+        None, "-n", "--ntags", help="not match all, comma separated list"
+    ),
+    tags_any_not: str = typer.Option(
+        None, "-N", "--Ntags", help="not match any, comma separated list"
+    ),
+    interactive: bool = typer.Option(False, "-i", help="interactive selection"),
+    verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     """
     Searches bookmark database analog 'search' command and filters additonally for
