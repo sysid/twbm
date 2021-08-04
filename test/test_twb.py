@@ -8,6 +8,7 @@ from twbm.twb import (
     check_tags,
     clean_tags,
     match_exact_tags,
+    Bookmarks,
 )
 
 
@@ -132,3 +133,43 @@ def test_check_tags(dal, tags, result):
     unknown_tags = check_tags(tags)
     assert unknown_tags == result
     _ = None
+
+
+@pytest.mark.parametrize(
+    (
+        "fts_query",
+        "tags_all",
+        "tags_all_not",
+        "tags_any",
+        "tags_any_not",
+        "tags_exact",
+        "result",
+    ),
+    (
+        ("", None, None, None, None, "aaa,bbb", 2),
+        ("xxxxx", None, None, None, None, None, 1),
+        ("xxxxx", "ccc,xxx,yyy", None, None, None, None, 1),
+        ("xxxxx", "xxx,yyy", None, None, None, None, 1),
+        ("xxxxx", "xxx,yyy", "not1,not2", "xxx", None, "ccc,xxx,yyy", 1),
+        ("xxxxx", "wrong", None, None, None, None, 0),
+    ),
+)
+class TestBookmarks:
+    def test_search_tags_exact(
+        self,
+        fts_query,
+        tags_all,
+        tags_all_not,
+        tags_any,
+        tags_any_not,
+        tags_exact,
+        result,
+    ):
+        bms = Bookmarks(fts_query=fts_query).filter(
+            tags_all=tags_all,
+            tags_all_not=tags_all_not,
+            tags_any=tags_any,
+            tags_any_not=tags_any_not,
+            tags_exact=tags_exact,
+        )
+        assert len(bms) == result

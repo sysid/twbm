@@ -131,6 +131,39 @@ class Bookmarks:
             filtered = [bm for bm in bms if match_exact_tags(tags, bm.split_tags)]
         return filtered
 
+    def filter(
+        self,
+        tags_all: str = None,
+        tags_all_not: str = None,
+        tags_any: str = None,
+        tags_any_not: str = None,
+        tags_exact: str = None,
+    ):
+        tags_all_ = normalize_tag_string(tags_all)
+        tags_any_ = normalize_tag_string(tags_any)
+        tags_all_not_ = normalize_tag_string(tags_all_not)
+        tags_any_not_ = normalize_tag_string(tags_any_not)
+        tags_exact_ = normalize_tag_string(tags_exact)
+
+        # 0. over-rule
+        if tags_exact is not None:
+            self.bms = Bookmarks.match_exact(tags_exact_, self.bms)
+        else:
+            # 1. select viable
+            if tags_all is not None:
+                self.bms = Bookmarks.match_all(tags_all_, self.bms)
+
+            if tags_any is not None:
+                self.bms = Bookmarks.match_any(tags_any_, self.bms)
+
+            # 2. narrow down
+            if tags_any_not is not None:
+                self.bms = Bookmarks.match_any(tags_any_not_, self.bms, not_=True)
+
+            if tags_all_not is not None:
+                self.bms = Bookmarks.match_all(tags_all_not_, self.bms, not_=True)
+        return self.bms
+
 
 def show_bms(bms: Sequence[Bookmark], err: bool = True):
     for i, bm in enumerate(bms):
@@ -276,32 +309,9 @@ def search(
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
 
-    tags_all_ = normalize_tag_string(tags_all)
-    tags_any_ = normalize_tag_string(tags_any)
-    tags_all_not_ = normalize_tag_string(tags_all_not)
-    tags_any_not_ = normalize_tag_string(tags_any_not)
-    tags_exact_ = normalize_tag_string(tags_exact)
-
-    # generate FTS full list for further tag filtering
-    bms = Bookmarks(fts_query=fts_query).bms
-
-    # 0. over-rule
-    if tags_exact is not None:
-        bms = Bookmarks.match_exact(tags_exact_, bms)
-    else:
-        # 1. select viable
-        if tags_all is not None:
-            bms = Bookmarks.match_all(tags_all_, bms)
-
-        if tags_any is not None:
-            bms = Bookmarks.match_any(tags_any_, bms)
-
-        # 2. narrow down
-        if tags_any_not is not None:
-            bms = Bookmarks.match_any(tags_any_not_, bms, not_=True)
-
-        if tags_all_not is not None:
-            bms = Bookmarks.match_all(tags_all_not_, bms, not_=True)
+    bms = Bookmarks(fts_query=fts_query).filter(
+        tags_all, tags_all_not, tags_any, tags_any_not, tags_exact
+    )
 
     # ordering of results
     if order_desc:
