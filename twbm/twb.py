@@ -480,7 +480,7 @@ def docs(
     show_bms(bms)
     typer.echo(f"Found: {len(bms)}", err=True)
 
-    if interactive:
+    if interactive or len(bms) > 3:
         process(bms)
     else:
         for bm in bms:
