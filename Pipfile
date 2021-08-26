@@ -12,6 +12,7 @@ pyyaml = "*"
 mock = "*"
 nuitka = "*"
 build = "*"
+pytest-mock = "*"
 
 [packages]
 # bookmarks-parser = "*"

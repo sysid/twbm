@@ -11,10 +11,12 @@ from twbm.db.dal import DAL
 import pytest
 from twbm.environment import config
 
-_log = logging.getLogger(__name__)
+_log = logging.getLogger()
 log_fmt = r"%(asctime)-15s %(levelname)s %(name)s %(funcName)s:%(lineno)d %(message)s"
 datefmt = "%Y-%m-%d %H:%M:%S"
 logging.basicConfig(format=log_fmt, level=config.log_level, datefmt=datefmt)
+# _log.propagate = True
+_ = None
 
 
 @pytest.fixture()

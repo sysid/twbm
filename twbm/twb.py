@@ -1,10 +1,8 @@
 import logging
 import os
-import subprocess
 import sys
 import webbrowser
 from os import isatty
-from pathlib import Path
 from typing import Sequence, List
 
 # import for nuitka
@@ -15,7 +13,8 @@ import typer
 from twbm.bookmarks import Bookmarks, clean_tags, parse_tags, check_tags
 from twbm.buku import edit_rec, BukuDb
 from twbm.db.dal import Bookmark, DAL
-from twbm.environment import config, OS_OPEN
+from twbm.environment import config
+from twbm.handle_uri import open_it
 
 _log = logging.getLogger(__name__)
 log_fmt = r"%(asctime)-15s %(levelname)s %(name)s %(funcName)s:%(lineno)d %(message)s"
@@ -148,47 +147,6 @@ def process(bms: Sequence[Bookmark]):
         )
         raise typer.Abort()
 
-
-def open_it(uri):
-    if OS_OPEN is None:
-        _log.error(f"Unknown OS architecture: {sys.platform}")
-        return
-
-    _log.debug(f"{uri=}")
-    p = Path.home()  # default setting
-
-    if uri.startswith("http"):
-        _log.debug(f"Http Link")
-        p = uri
-        # webbrowser.open(uri, new=2)
-    elif uri[0] in "/,.,~,$":
-        if uri.startswith("/"):
-            _log.debug(f"Absolute path.")
-            p = Path(uri)
-        elif uri.startswith("~"):
-            _log.debug(f"Path with prefix tilde.")
-            p = Path(uri).expanduser().absolute()
-        elif uri.startswith("$"):
-            _log.debug(f"Path with environment prefix.")
-            p = Path(uri)
-            env_path = os.getenv(p.parts[0].strip("$"), None)
-            if env_path is None:
-                _log.warning(f"{p.parts[0]} not set in environment. Cannot proceed.")
-                return
-            p = Path(env_path) / Path(*p.parts[1:])
-        elif uri.startswith("."):
-            _log.debug(f"Relative path: {uri}, working dir: {os.getcwd()}")
-            p = Path(uri).absolute()
-
-        if not p.exists():
-            _log.warning(f"{p} does not exists.")
-            return
-    else:
-        _log.warning(f"Unknown protocol: {uri=}")
-        return
-
-    _log.info(f"Opening: {p}")
-    subprocess.run([OS_OPEN, p])
 
 @app.command()
 def search(
