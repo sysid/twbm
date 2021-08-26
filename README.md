@@ -8,6 +8,7 @@ Inspired by https://github.com/jarun/buku.
 
 Why not just use buku?
 
+- open general URI, i.e. also local files/directories
 - better full-text search.
 - check tags for consistency when adding new bookmark
 - alphabetical ordering of `deep` search results
@@ -50,13 +51,18 @@ twbm search xxxxx | twbm update -t x
 
 # Search by any tag and sort by bookmark age ascending
 twbm search -T tag1,tag2 -O
+
+# Adding URI to local files
+twbm add /home/user/presentation.pptx tag1,tag2 --title 'My super Presentation'
 ```
-Taglists must not have blanks and have comma separator.
+Tags must be separated by comma without blanks.
+When adding an generic URI, which is not starting with 'http', the hint 'Malformed URL' can be ignored.
 
 Selection of multiple bookmarks for opening in browser is possible, of course:
 ![Multi selection](multi-select.png)
 
-After selecting you are straight back at the bash prompt.
+After selection the program ends and returns to the command line prompt.
+
 
 ## Installation
 ```bash
