@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Sequence
+from typing import Sequence, Optional
 
 import aiosql
 import sqlalchemy as sa
@@ -34,7 +34,7 @@ sim_results_table = sa.Table(
 class Bookmark(BaseModel):
     id: int = None
     URL: str = ""
-    metadata: str = ""
+    metadata: Optional[str] = ""
     tags: str = ",,"
     desc: str = ""
     flags: int = 0

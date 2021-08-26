@@ -325,7 +325,7 @@ def open(
 def add(
     # ctx: typer.Context,
     url_data: List[str] = typer.Argument(..., help="URL and tags"),
-    title: str = typer.Option("", "--title"),
+    title: str = typer.Option(None, "--title"),
     desc: str = typer.Option("", "-d", "--desc"),
     edit: bool = typer.Option(False, "-e", "--edit", help="open in editor"),
     verbose: bool = typer.Option(False, "-v", "--verbose"),

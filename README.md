@@ -102,6 +102,7 @@ This should make it easy to extend and add functionality in an object-oriented m
 ```bash
 rm buku
 wget https://raw.githubusercontent.com/jarun/buku/master/buku .
+black buku
 diff buku.py buku
 ```
 
