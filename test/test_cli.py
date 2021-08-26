@@ -47,11 +47,17 @@ class TestSearch:
         print(result.stdout)
         assert result.exit_code == 0
 
-    @pytest.mark.skip("Interactive Tests.")
+    # @pytest.mark.skip("Interactive Tests.")
     def test_search_browser_should_open(self, dal):
         result = runner.invoke(app, ["search", "-v"], input="1 2\n")
         print(result.stdout)
-        assert result.exit_code == 1
+        assert result.exit_code == 0
+
+    # @pytest.mark.skip("Interactive Tests.")
+    def test_search_file_should_open(self, dal):
+        result = runner.invoke(app, ["search", "-v", "pptx"], input="0\n")
+        print(result.stdout)
+        assert result.exit_code == 0
 
 
 @pytest.mark.skip("Notnworking: not allowed operations: fileno()")
