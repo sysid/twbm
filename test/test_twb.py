@@ -14,7 +14,17 @@ from twbm.twb import (
         ((1,), None, ("ccc", "xxx", "yyy"), False, ",,"),
     ),
 )
-def test_update(dal, ids, tags, tags_not, result, force):
+def test__update_tags(dal, ids, tags, tags_not, result, force):
     # _update_tags((0,), ('x',), ('ob',))
     _update_tags(ids, tags, tags_not, force=force)
     assert dal.get_bookmarks(fts_query="xxxxx")[0].tags == result
+
+
+@pytest.mark.skip("Not implemented yet")
+def test_show_bmw():
+    pass
+
+
+@pytest.mark.skip("Not implemented yet")
+def test_show_bmw():
+    pass

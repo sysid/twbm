@@ -59,6 +59,8 @@ def _update_tags(
             bm.tags = new_tags
             dal.update_bookmark(bm)
 
+            show_bms((bm,))
+
 
 def show_bms(bms: Sequence[Bookmark], err: bool = True):
     for i, bm in enumerate(bms):

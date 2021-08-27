@@ -153,6 +153,7 @@ if os.path.isfile("/etc/ssl/certs/ca-certificates.crt"):
     CA_CERTS = "/etc/ssl/certs/ca-certificates.crt"
 else:
     import certifi
+
     CA_CERTS = certifi.where()
 
 sql_str = """
