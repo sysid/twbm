@@ -373,7 +373,7 @@ def add(
         else:
             raise typer.Abort()
 
-    _ = BukuDb(dbfile=config.dbfile).add_rec(
+    id_ = BukuDb(dbfile=config.dbfile).add_rec(
         url=url,
         title_in=title,
         tags_in=tags_in,
@@ -382,6 +382,9 @@ def add(
         delay_commit=False,
         fetch=(not nofetch),
     )
+    with DAL(env_config=config) as dal:
+        bm = dal.get_bookmark_by_id(id_=id_)
+        show_bms((bm,))
 
 
 @app.command()
