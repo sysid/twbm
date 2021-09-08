@@ -11,8 +11,8 @@ class TestSearch:
         result = runner.invoke(app, ["search", "-v"], input="d 1 2\n")
         print(result.stdout)
         assert result.exit_code == 0
-        assert "Index 2 deleted" in result.stdout
-        assert "Index 1 deleted" in result.stdout
+        assert "Index 4 deleted" in result.stdout
+        assert "Index 3 deleted" in result.stdout
 
     def test_search_p(self, dal):
         result = runner.invoke(app, ["search", "-v"], input="p 1 2\n")

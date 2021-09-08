@@ -126,15 +126,16 @@ def process(bms: Sequence[Bookmark]):
                 typer.echo(f"-W- no selection. Do nothing.")
                 raise typer.Exit()
             else:
-                for id_ in reversed(
+                for i in reversed(
                     selection
                 ):  # must be reversed because of compacting
-                    typer.echo(id_)
+                    bm = bms[i]
+                    typer.echo(bm.id)
                     _ = BukuDb(dbfile=config.dbfile).delete_rec(
-                        index=id_, delay_commit=False
+                        index=bm.id, delay_commit=False
                     )
                     typer.echo(
-                        f"-M- Deleted entry: {bms[id_].metadata}: {bms[id_].URL}"
+                        f"-M- Deleted entry: {bm.metadata}: {bm.URL}"
                     )
 
         elif cmd == "e":
