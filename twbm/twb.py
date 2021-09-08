@@ -115,7 +115,7 @@ def process(bms: Sequence[Bookmark]):
 
         if cmd == "p":
             if len(selection) == 0:
-                ids = [bm.id for bm in bms]
+                ids = [bm.id for bm in bms]  # print all ids to stdout for piping
             else:
                 for i in selection:
                     ids.append(bms[i].id)
@@ -129,13 +129,22 @@ def process(bms: Sequence[Bookmark]):
                 for id_ in reversed(
                     selection
                 ):  # must be reversed because of compacting
-                    print(id_)
+                    typer.echo(id_)
                     _ = BukuDb(dbfile=config.dbfile).delete_rec(
                         index=id_, delay_commit=False
                     )
                     typer.echo(
                         f"-M- Deleted entry: {bms[id_].metadata}: {bms[id_].URL}"
                     )
+
+        elif cmd == "e":
+            if len(selection) == 0:
+                typer.echo(f"-W- no selection. Do nothing.")
+                raise typer.Exit()
+            for i in selection:
+                typer.echo(bms[i].id)
+                _ = BukuDb(dbfile=config.dbfile).edit_update_rec(index=bms[i].id, immutable=1)
+
         elif cmd == "h":
             typer.echo(help_text, err=True)
         else:
