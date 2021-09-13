@@ -92,6 +92,8 @@ def process(bms: Sequence[Bookmark]):
         p <n1> <n2>:    print id-list of selection
         p:              print all ids
         d <n1> <n2>:    delete selection
+        e:              edit selection
+        q:              quit
         h:              help
     """
     typer.secho(f"Selection: ", fg=typer.colors.GREEN, err=True)
@@ -148,6 +150,10 @@ def process(bms: Sequence[Bookmark]):
 
         elif cmd == "h":
             typer.echo(help_text, err=True)
+
+        elif cmd == "q":
+            raise typer.Exit()
+
         else:
             typer.secho(f"-E- Invalid command {cmd}\n", err=True)
             typer.echo(help_text, err=True)
