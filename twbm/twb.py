@@ -475,21 +475,24 @@ def docs(
     tags_any_not: str = typer.Option(
         None, "-N", "--Ntags", help="not match any, comma separated list"
     ),
+    tags_prefix: str = typer.Option(
+        "doc", "--prefix", help="tags to prefix the tags option"
+    ),
     interactive: bool = typer.Option(False, "-i", help="interactive selection"),
     verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     """
-    Searches bookmark database analog 'search' command and filters additonally for
-    tag 'doc'. Opens the results in browser unless -i is specified.
+    Searches bookmark database analog 'search' command and filters additionally for
+    prefix tags. Opens 3 results in browser unless -i is specified.
     """
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
 
     if tags_all is None:
-        tags_all = "doc"
+        tags_all = tags_prefix
     else:
-        tags_all = f"{tags_all},doc"
-    print(tags_all)
+        tags_all = f"{tags_all},{tags_prefix}"
+    typer.echo(f"Tags: {tags_all}")
     bms = Bookmarks(fts_query=fts_query).filter(
         tags_all, tags_all_not, tags_any, tags_any_not, tags_exact
     )
