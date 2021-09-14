@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with buku.  If not, see <http://www.gnu.org/licenses/>.
 
-from enum import Enum
-from itertools import chain
 import argparse
 import calendar
 import cgi
@@ -36,20 +34,23 @@ import signal
 import sqlite3
 import struct
 import subprocess
-from subprocess import Popen, PIPE, DEVNULL
 import sys
 import tempfile
 import textwrap
 import threading
 import time
-from typing import Any, Dict, Iterable, List, Optional, Tuple
 import unicodedata
 import webbrowser
+from enum import Enum
+from itertools import chain
+from subprocess import Popen, PIPE, DEVNULL
+from typing import Any, Dict, Iterable, List, Optional, Tuple
+
 import urllib3
 from aiosql import aiosql
+from bs4 import BeautifulSoup
 from urllib3.exceptions import LocationParseError
 from urllib3.util import parse_url, make_headers, Retry
-from bs4 import BeautifulSoup
 
 # note catch ModuleNotFoundError instead Exception
 # when python3.5 not supported
@@ -3806,7 +3807,8 @@ def parse_decoded_page(page):
     desc = None
     keys = None
 
-    soup = BeautifulSoup(page, "html5lib")
+    # soup = BeautifulSoup(page, "html5lib")
+    soup = BeautifulSoup(page, "html.parser")  # https://github.com/coursera-dl/edx-dl/issues/434
 
     try:
         title = soup.find("title").text.strip().replace("\n", " ")
