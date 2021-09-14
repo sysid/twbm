@@ -233,7 +233,7 @@ def search(
     elif order_asc:
         bms = list(reversed(sorted(bms, key=lambda bm: bm.last_update_ts)))
     else:
-        bms = sorted(bms, key=lambda bm: bm.metadata.lower())
+        bms = sorted(bms, key=lambda bm: bm.metadata.lower() if bm.metadata else "")
 
     show_bms(bms)
     typer.echo(f"Found: {len(bms)}", err=True)
