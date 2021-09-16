@@ -20,6 +20,14 @@ class TestSearch:
         assert result.exit_code == 0
         assert "xxxxx" in result.stdout
 
+    def test_edit_all(self, mocker, dal):
+        mocked = mocker.patch("twbm.twb.BukuDb.edit_update_rec")
+        result = runner.invoke(app, ["search", "-v"], input="e\n")
+        print(result.stdout)
+
+        # than all table entries should be edited
+        assert len(mocked.call_args_list) == 9
+
     def test_search(self, dal):
         result = runner.invoke(app, ["search", "-v", "--np", "xxxxx"])
         print(result.stdout)

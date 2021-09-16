@@ -142,11 +142,14 @@ def process(bms: Sequence[Bookmark]):
 
         elif cmd == "e":
             if len(selection) == 0:
-                typer.echo(f"-W- no selection. Do nothing.")
-                raise typer.Exit()
-            for i in selection:
-                typer.echo(bms[i].id)
-                _ = BukuDb(dbfile=config.dbfile).edit_update_rec(index=bms[i].id, immutable=1)
+                # typer.echo(f"-W- no selection. Do nothing.")
+                # raise typer.Exit()
+                for bm in bms:
+                    _ = BukuDb(dbfile=config.dbfile).edit_update_rec(index=bm.id, immutable=1)
+            else:
+                for i in selection:
+                    typer.echo(bms[i].id)
+                    _ = BukuDb(dbfile=config.dbfile).edit_update_rec(index=bms[i].id, immutable=1)
 
         elif cmd == "h":
             typer.echo(help_text, err=True)
