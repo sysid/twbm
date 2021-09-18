@@ -128,28 +128,28 @@ def process(bms: Sequence[Bookmark]):
                 typer.echo(f"-W- no selection. Do nothing.")
                 raise typer.Exit()
             else:
-                for i in reversed(
-                    selection
-                ):  # must be reversed because of compacting
+                for i in reversed(selection):  # must be reversed because of compacting
                     bm = bms[i]
                     typer.echo(bm.id)
                     _ = BukuDb(dbfile=config.dbfile).delete_rec(
                         index=bm.id, delay_commit=False
                     )
-                    typer.echo(
-                        f"-M- Deleted entry: {bm.metadata}: {bm.URL}"
-                    )
+                    typer.echo(f"-M- Deleted entry: {bm.metadata}: {bm.URL}")
 
         elif cmd == "e":
             if len(selection) == 0:
                 # typer.echo(f"-W- no selection. Do nothing.")
                 # raise typer.Exit()
                 for bm in bms:
-                    _ = BukuDb(dbfile=config.dbfile).edit_update_rec(index=bm.id, immutable=1)
+                    _ = BukuDb(dbfile=config.dbfile).edit_update_rec(
+                        index=bm.id, immutable=1
+                    )
             else:
                 for i in selection:
                     typer.echo(bms[i].id)
-                    _ = BukuDb(dbfile=config.dbfile).edit_update_rec(index=bms[i].id, immutable=1)
+                    _ = BukuDb(dbfile=config.dbfile).edit_update_rec(
+                        index=bms[i].id, immutable=1
+                    )
 
         elif cmd == "h":
             typer.echo(help_text, err=True)
@@ -243,6 +243,9 @@ def search(
 
     if not non_interactive:
         process(bms)
+    else:
+        ids = [bm.id for bm in bms]  # print all ids to stdout for piping
+        typer.echo(",".join((str(x) for x in ids)), err=False)  # stdout for piping
 
 
 @app.command()

@@ -3808,7 +3808,9 @@ def parse_decoded_page(page):
     keys = None
 
     # soup = BeautifulSoup(page, "html5lib")
-    soup = BeautifulSoup(page, "html.parser")  # https://github.com/coursera-dl/edx-dl/issues/434
+    soup = BeautifulSoup(
+        page, "html.parser"
+    )  # https://github.com/coursera-dl/edx-dl/issues/434
 
     try:
         title = soup.find("title").text.strip().replace("\n", " ")

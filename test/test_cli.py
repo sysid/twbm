@@ -28,11 +28,13 @@ class TestSearch:
         # than all table entries should be edited
         assert len(mocked.call_args_list) == 9
 
-    def test_search(self, dal):
-        result = runner.invoke(app, ["search", "-v", "--np", "xxxxx"])
+    def test_search_non_interactive(self, dal):
+        tosearch = '"http://11111/11111"'
+        result = runner.invoke(app, ["search", "-v", "--np", tosearch])
         print(result.stdout)
         assert result.exit_code == 0
-        assert "xxxxx" in result.stdout
+        assert "11111" in result.stdout
+        assert "5" in result.stdout  # print for pipeline
 
     def test_search_tags_exact(self, dal):
         result = runner.invoke(app, ["search", "-v", "--np", "-e", "aaa,bbb"])
