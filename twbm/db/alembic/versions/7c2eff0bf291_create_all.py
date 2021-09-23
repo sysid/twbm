@@ -17,8 +17,8 @@ depends_on = None
 after_insert = """
 CREATE TRIGGER bookmarks_ai AFTER INSERT ON bookmarks
     BEGIN
-        INSERT INTO bookmarks_fts (rowid, URL, metadata, "desc")
-        VALUES (new.id, new.URL, new.metadata, new.desc);
+        INSERT INTO bookmarks_fts (rowid, URL, metadata, tags, "desc")
+        VALUES (new.id, new.URL, new.metadata, new.tags, new.desc);
     END;
 """
 
@@ -26,8 +26,8 @@ CREATE TRIGGER bookmarks_ai AFTER INSERT ON bookmarks
 after_delete = """
 CREATE TRIGGER bookmarks_ad AFTER DELETE ON bookmarks
     BEGIN
-        INSERT INTO bookmarks_fts (bookmarks_fts, rowid, URL, metadata, "desc")
-        VALUES ('delete', old.id, old.URL, old.metadata, old.desc);
+        INSERT INTO bookmarks_fts (bookmarks_fts, rowid, URL, metadata, tags, "desc")
+        VALUES ('delete', old.id, old.URL, old.metadata, old.tags, old.desc);
     END;
 """
 
@@ -35,10 +35,10 @@ CREATE TRIGGER bookmarks_ad AFTER DELETE ON bookmarks
 after_update = """
 CREATE TRIGGER bookmarks_au AFTER UPDATE ON bookmarks
     BEGIN
-        INSERT INTO bookmarks_fts (bookmarks_fts, rowid, URL, metadata, "desc")
-        VALUES ('delete', old.id, old.URL, old.metadata, old.desc);
-        INSERT INTO bookmarks_fts (rowid, URL, metadata, "desc")
-        VALUES (new.id, new.URL, new.metadata, new.desc);
+        INSERT INTO bookmarks_fts (bookmarks_fts, rowid, URL, metadata, tags, "desc")
+        VALUES ('delete', old.id, old.URL, old.metadata, old.tags, old.desc);
+        INSERT INTO bookmarks_fts (rowid, URL, metadata, tags, "desc")
+        VALUES (new.id, new.URL, new.metadata, new.tags, new.desc);
     END;
 """
 
@@ -47,7 +47,7 @@ CREATE VIRTUAL TABLE bookmarks_fts USING fts5(
     id,
     URL,
     metadata,
-    tags UNINDEXED,
+    tags,
     "desc",
     flags UNINDEXED,
     content='bookmarks',

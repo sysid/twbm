@@ -37,7 +37,8 @@ def test_get_bookmark_by_id(dal):
 
 def test_get_bookmarks_via_fts(dal):
     bms = dal.get_bookmarks(fts_query="aaa")
-    assert len(bms) == 1
+    # assert len(bms) == 1
+    assert len(bms) == 4  # with FTS covering tags
 
 
 def test_get_bookmarks_raw(dal):
