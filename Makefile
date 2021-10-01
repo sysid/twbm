@@ -51,7 +51,7 @@ clean:  ## remove ./dist
 	rm -rf ./dist
 
 .PHONY: build
-build:  ## build
+build: clean  ## build
 	@echo "building"
 #	git add .
 #	git commit
