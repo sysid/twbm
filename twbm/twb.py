@@ -464,8 +464,8 @@ def tags(
             tags = dal.get_all_tags()
         else:
             tags = dal.get_related_tags(tag=tag)
-        output = "\n".join(tags)
-        typer.echo(f"{output}", err=True)
+        for t in tags:
+            typer.echo(f"{t[1]:>4}: {t[0]}", err=True)
 
 
 @app.command()

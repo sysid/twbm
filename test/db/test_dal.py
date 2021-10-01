@@ -96,7 +96,7 @@ def test_split_tags(dal):
 
 
 @pytest.mark.parametrize(
-    ("tag", "result"), (("ccc", ["aaa", "bbb", "ccc", "xxx", "yyy"]),)
+    ("tag", "result"), (("ccc", [('ccc', 3), ('bbb', 2), ('aaa', 2), ('yyy', 1), ('xxx', 1)]),)
 )
 def test_get_related_tags(dal, tag, result):
     tags = dal.get_related_tags(tag=tag)
@@ -109,7 +109,7 @@ def test_get_related_tags(dal, tag, result):
 def test_get_all_tags(dal):
     tags = dal.get_all_tags()
     print(tags)
-    result = ["aaa", "bbb", "ccc", "xxx", "yyy"]
+    result = [('bbb', 4), ('aaa', 4), ('ccc', 3), ('yyy', 1), ('xxx', 1)]
     assert tags == result
     assert len(tags) >= len(result)
 

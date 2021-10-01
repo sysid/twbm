@@ -193,10 +193,11 @@ class DAL:
                        substr(rest, instr(rest, ',') + 1)
                 FROM split
                 WHERE rest <> '')
-            SELECT distinct tags
+            SELECT tags, count(tags) as n
             FROM split
             WHERE tags <> ''
-            ORDER BY tags;
+            group by tags
+            ORDER BY 2 desc;
         """
         queries = aiosql.from_str(query, "sqlite3")
         sql_result = queries.get_related_tags(self.conn.connection, tag_query=tag_query)
@@ -204,9 +205,9 @@ class DAL:
         # if not sql_result:
         #     # noinspection PyRedundantParentheses
         #     return (Bookmark(),)
-        return [tags[0] for tags in sql_result]
+        return sql_result
 
-    def get_all_tags(self):
+    def get_all_tags(self, with_frequency: bool = False):
         # noinspection SqlResolve
         query = """
             -- name: get_all_tags
@@ -218,12 +219,17 @@ class DAL:
                        substr(rest, instr(rest, ',') + 1)
                 FROM split
                 WHERE rest <> '')
-            SELECT distinct tags
+            SELECT tags, count(tags) as n
             FROM split
             WHERE tags <> ''
-            ORDER BY tags;
+            group by tags
+            ORDER BY 2 desc;
         """
         queries = aiosql.from_str(query, "sqlite3")
         sql_result = queries.get_all_tags(self.conn.connection)
 
-        return [tags[0] for tags in sql_result]
+        return sql_result
+        # if with_frequency:
+        #     return sql_result
+        # else:
+        #     return [tags[0] for tags in sql_result]

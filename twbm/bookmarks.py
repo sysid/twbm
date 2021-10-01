@@ -110,7 +110,7 @@ def match_any_tag(tags: Sequence, bm_tags: Sequence) -> bool:
 
 def check_tags(tags: Sequence[str]) -> Sequence[str]:
     with DAL(env_config=config) as dal:
-        all_tags = set(dal.get_all_tags())
+        all_tags = set([r[0] for r in dal.get_all_tags()])
         return sorted((set(tags) - all_tags))
 
 
