@@ -52,11 +52,6 @@ class TestSearch:
         result = runner.invoke(app, ["search", "-v", "--np", "-e", "aaa,", "bbb"])
         print(result.stdout)
 
-    def test_search_non_existing_docs(self, dal):
-        result = runner.invoke(app, ["docs", "-v"], input="1 2\n")
-        print(result.stdout)
-        assert result.exit_code == 0
-
 
 @pytest.mark.skip("Interactive Tests.")
 class TestHandleUri:
