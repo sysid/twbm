@@ -4,30 +4,29 @@
 
 [sysid blog: twbm](https://sysid.github.io/twbm/)
 
-Inspired by https://github.com/jarun/buku.
+Generic URI manager for the command line.
 
-Why not just use buku?
-
-- open general URI, i.e. also local files/directories
-- better full-text search.
+Features:
+- manages URIs in sqlite database
+- know how to open HTTP URLs, directories, files (e.g. Office, Images, ....)
+- can execute URIs as shell commands via the protocol prefix: 'shell::'
+  URI-Example: `shell::vim +/"## SqlAlchemy" $HOME/document.md`
+- full-text search across URIs
+- tags for URI classification
 - check tags for consistency when adding new bookmark
-- alphabetical ordering of `deep` search results
-- no tools like bukuserver, only CLI
 
+Inspired by https://github.com/jarun/buku.
 If you are happy using [buku](https://github.com/jarun/buku), by all means stick with it. It is battle tested.
 
 [twbm](https://github.com/sysid/twbm) is 100% buku compatible.   
 Switch back and forth between **twbm** and **buku** is possible without data loss.
 
-To harness `twbm`'s power, use correct FTS search syntax (see: https://www.sqlite.org/fts5.html chapter 3). 
+To harness `twbm`'s power use full-text query syntax (see: https://www.sqlite.org/fts5.html chapter 3). 
 
 ## Usage
 Two complementary commands are provided:
-1. **twbm**: CLI tool with FTS for bookmark management
+1. **twbm**: CLI tool with FTS for generic URI management
 2. **twbuku**: 100% buku with small enhancements and usage of an enhanced database
-
-This allows to use the battle-tested buku interface where preferred and still benefit from additional features 
-while using one enhanced bookmark database.
 
 Getting help: `twbm --help`
 
@@ -54,9 +53,12 @@ twbm search -T tag1,tag2 -O
 
 # Adding URI to local files
 twbm add /home/user/presentation.pptx tag1,tag2 --title 'My super Presentation'
+
+# Adding shell commands as URI
+twbm add "shell::vim +/'# SqlAlchemy' sql.md" shell,sql,doc --title 'sqlalchemy snippets'
 ```
 Tags must be separated by comma without blanks.
-When adding an generic URI, which is not starting with 'http', the hint 'Malformed URL' can be ignored.
+When adding a generic URI, which is not starting with 'http', the cli message 'Malformed URL' can be ignored.
 
 Selection of multiple bookmarks for opening in browser is possible, of course:
 ![Multi selection](multi-select.png)

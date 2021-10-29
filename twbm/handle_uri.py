@@ -29,7 +29,6 @@ def open_it(uri: str):
 
     if uri.startswith("shell::"):
         cmd = uri.removeprefix("shell::")
-        _log.debug(f"Running shell command: {cmd}")
         run_it(cmd)
         return
     if uri.startswith("http"):
@@ -72,10 +71,11 @@ def run_it(cmd: str):
     better shell handling:
     s = shlex(cmd, posix=True, punctuation_chars=True)
     """
+    _log.info(f"{cmd=}")
     subprocess.run(cmd, shell=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # cmd = "vim +/'## SqlAlchemy' ../test/tests_data/sample_docu.md"
     # cmd = "vim +/'## SqlAlchemy' /Users/Q187392/dev/py/twbm/test/tests_data/sample_docu.md"
     # cmd = "vim +/'## SqlAlchemy' $HOME/dev/py/twbm/test/tests_data/sample_docu.md"

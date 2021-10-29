@@ -26,7 +26,7 @@ class TestSearch:
         print(result.stdout)
 
         # than all table entries should be edited
-        assert len(mocked.call_args_list) == 9
+        assert len(mocked.call_args_list) == 10
 
     def test_search_non_interactive(self, dal):
         tosearch = '"http://11111/11111"'
@@ -62,6 +62,12 @@ class TestHandleUri:
 
     def test_search_pptx_should_open(self, dal):
         result = runner.invoke(app, ["search", "-v", "pptx"], input="0\n")
+        print(result.stdout)
+        assert result.exit_code == 0
+
+    @pytest.mark.skip("not working without terminal")
+    def test_search_shell_exec(self, dal):
+        result = runner.invoke(app, ["search", "-v", "shell open vim"], input="0\n")
         print(result.stdout)
         assert result.exit_code == 0
 

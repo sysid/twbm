@@ -17,7 +17,10 @@ class TestOpenIt:
             ),
             ("/Users/Q187392/dev", "/Users/Q187392/dev"),
             ("~/dev", "/Users/Q187392/dev"),
-            ("shell::vim +/'## SqlAlchemy' ./tests_data/sample_docu.md", "Running shell command"),
+            (
+                "shell::vim +/'## SqlAlchemy' ./tests_data/sample_docu.md",
+                "Running shell command",
+            ),
         ),
     )
     def test_open_it(self, mocker, uri, result, caplog):
