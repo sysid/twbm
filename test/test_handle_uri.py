@@ -5,7 +5,7 @@ import pytest
 from twbm.handle_uri import open_it
 
 
-@pytest.mark.skip("Only working when run in isolaotion, caplog problem?")
+@pytest.mark.skip("Only working when run in isolation, caplog problem?")
 class TestOpenIt:
     @pytest.mark.parametrize(
         ("uri", "result"),
@@ -17,6 +17,7 @@ class TestOpenIt:
             ),
             ("/Users/Q187392/dev", "/Users/Q187392/dev"),
             ("~/dev", "/Users/Q187392/dev"),
+            ("shell::vim +/'## SqlAlchemy' ./tests_data/sample_docu.md", "Running shell command"),
         ),
     )
     def test_open_it(self, mocker, uri, result, caplog):
@@ -32,3 +33,8 @@ class TestOpenIt:
                 subprocess_run.assert_called()
 
         assert result in caplog.text
+
+
+@pytest.mark.skip("Only runs in terminal interactively, see __main__")
+def test_run_it():
+    pass

@@ -19,7 +19,7 @@ else:
     OS_OPEN = None
 
 
-def open_it(uri):
+def open_it(uri: str):
     if OS_OPEN is None:
         _log.error(f"Unknown OS architecture: {sys.platform}")
         return
@@ -27,8 +27,13 @@ def open_it(uri):
     _log.debug(f"{uri=}")
     p = Path.home()  # default setting
 
+    if uri.startswith("shell::"):
+        cmd = uri.removeprefix("shell::")
+        _log.debug(f"Running shell command: {cmd}")
+        run_it(cmd)
+        return
     if uri.startswith("http"):
-        _log.debug(f"Http Link")
+        _log.debug(f"Opening HTTP Link")
         # p = uri
         webbrowser.open(uri, new=2)
         return
@@ -60,3 +65,19 @@ def open_it(uri):
 
     _log.info(f"Opening: {p}")
     subprocess.run([OS_OPEN, p])
+
+
+def run_it(cmd: str):
+    """
+    better shell handling:
+    s = shlex(cmd, posix=True, punctuation_chars=True)
+    """
+    subprocess.run(cmd, shell=True)
+
+
+if __name__ == '__main__':
+    # cmd = "vim +/'## SqlAlchemy' ../test/tests_data/sample_docu.md"
+    # cmd = "vim +/'## SqlAlchemy' /Users/Q187392/dev/py/twbm/test/tests_data/sample_docu.md"
+    # cmd = "vim +/'## SqlAlchemy' $HOME/dev/py/twbm/test/tests_data/sample_docu.md"
+    cmd = "vim +/'## SqlAlchemy' ~/dev/py/twbm/test/tests_data/sample_docu.md"
+    run_it(cmd)
