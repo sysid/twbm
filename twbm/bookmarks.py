@@ -15,6 +15,7 @@ class Bookmarks:
 
         with DAL(env_config=config) as dal:
             self.bms = dal.get_bookmarks(fts_query=fts_query)
+        _ = None
 
     @staticmethod
     def match_all(

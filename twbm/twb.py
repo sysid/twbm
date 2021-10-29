@@ -232,10 +232,11 @@ def search(
             d <n1> <n2>:    delete selection
             h:              help
     """
-    if tags_all is None:
-        tags_all = tags_prefix
-    else:
-        tags_all = f"{tags_all},{tags_prefix}"
+    if tags_prefix is not None:
+        if tags_all is None:
+            tags_all = tags_prefix
+        else:
+            tags_all = f"{tags_all},{tags_prefix}"
 
     if verbose:
         typer.echo(f"{config.twbm_db_url=}, {tags_all=}", err=True)

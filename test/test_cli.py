@@ -50,6 +50,13 @@ class TestSearch:
 
     def test_search_tags_exact_invalid(self, dal):
         result = runner.invoke(app, ["search", "-v", "--np", "-e", "aaa,", "bbb"])
+        assert result.exit_code == 0
+        print(result.stdout)
+
+    def test_search_tags(self, dal):
+        result = runner.invoke(app, ["search", "-v", "--np", "-t", "aaa,"])
+        assert result.exit_code == 0
+        assert len([x for x in result.stdout.split("\n") if "http" in x]) == 4
         print(result.stdout)
 
 
