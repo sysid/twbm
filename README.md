@@ -1,4 +1,4 @@
-# twbm: Bookmarks via Commandline (CLI)
+# twbm: URI Management and WEB-Browsing via Commandline (CLI)
 
 [![PyPI Version][pypi-image]][pypi-url]
 
