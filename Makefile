@@ -87,7 +87,7 @@ install: clean build uninstall ## pipx install
 
 .PHONY: uninstall
 uninstall:  ## pipx uninstall
-	pipx uninstall twbm
+	-pipx uninstall twbm
 
 .PHONY: bump-minor
 bump-minor:  ## bump-minor

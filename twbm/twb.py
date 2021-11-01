@@ -85,7 +85,7 @@ def show_bms(bms: Sequence[Bookmark], err: bool = True):
             typer.secho(f"{' ':>{offset}}{bm.desc}", fg=None, err=err)
         typer.secho(
             f"{' ':>{offset}}{', '.join((tag for tag in bm.split_tags if tag != ''))}",
-            fg=typer.colors.BLUE,
+            fg=typer.colors.BRIGHT_BLUE,
             err=err,
         )
         typer.secho("", err=err)
