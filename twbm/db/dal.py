@@ -158,13 +158,12 @@ class DAL:
             sql_result = queries.get_bookmarks(
                 self.conn.connection, fts_query=fts_query
             )
-        else:  # TODO: make normal query
+        else:
             query = """
                 -- name: get_bookmarks
                 -- record_class: Bookmark
                 select *
-                from bookmarks_fts
-                order by rank;
+                from bookmarks;
             """
             queries = aiosql.from_str(
                 query, "sqlite3", record_classes=self.record_classes

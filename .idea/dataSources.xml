@@ -15,13 +15,6 @@
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/test/tests_data/bm_test.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="sql/bm.db" uuid="a2ef33e8-d4c7-47de-9874-32e6513a914d">
-      <driver-ref>sqlite.xerial</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/sql/bm.db</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
     <data-source source="LOCAL" name="fts" uuid="6eaa623c-5c22-464c-b9a9-142a217bad78">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>

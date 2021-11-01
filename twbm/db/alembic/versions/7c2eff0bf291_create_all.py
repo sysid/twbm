@@ -50,6 +50,7 @@ CREATE VIRTUAL TABLE bookmarks_fts USING fts5(
     tags,
     "desc",
     flags UNINDEXED,
+    last_update_ts UNINDEXED,
     content='bookmarks',
     content_rowid='id',
     tokenize="porter unicode61",
