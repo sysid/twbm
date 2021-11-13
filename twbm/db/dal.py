@@ -1,12 +1,12 @@
 import logging
 from datetime import datetime
-from typing import Sequence, Optional
+from typing import Optional, Sequence
 
 import aiosql
 import sqlalchemy as sa
 from pydantic import BaseModel
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine, Connection
+from sqlalchemy.engine import Connection, Engine
 
 # from twbm.environment import Environment
 

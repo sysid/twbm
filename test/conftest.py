@@ -3,12 +3,11 @@ import os
 from pathlib import Path
 
 import aiosql
+import pytest
 from alembic import command
 from alembic.config import Config
 
 from twbm.db.dal import DAL
-
-import pytest
 from twbm.environment import config
 
 _log = logging.getLogger()

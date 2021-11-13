@@ -1,8 +1,6 @@
 import pytest
 
-from twbm.twb import (
-    _update_tags,
-)
+from twbm.twb import _update_tags
 
 
 @pytest.mark.parametrize(

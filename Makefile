@@ -71,10 +71,11 @@ tag:  ## tag with VERSION
 	git push --tags
 
 .PHONY: format
-format:  ## format with black
-	@echo "Formatting with black"
+format:  ## format with black and isort
+	@echo "Formatting with black and isort"
 	#black --check --verbose --exclude="twbm/buku.py" .
 	black --verbose --exclude="twbm/buku.py" .
+	isort .
 
 .PHONY: init
 init-db:  ## copy prod db to sql/bm.db and clean

@@ -3,16 +3,16 @@ import os
 import sys
 import webbrowser
 from os import isatty
-from typing import Sequence, List
+from typing import List, Sequence
 
 # import for nuitka
 # noinspection PyUnresolvedReferences
 import sqlalchemy.sql.default_comparator
 import typer
 
-from twbm.bookmarks import Bookmarks, clean_tags, parse_tags, check_tags
-from twbm.buku import edit_rec, BukuDb
-from twbm.db.dal import Bookmark, DAL
+from twbm.bookmarks import Bookmarks, check_tags, clean_tags, parse_tags
+from twbm.buku import BukuDb, edit_rec
+from twbm.db.dal import DAL, Bookmark
 from twbm.environment import config
 from twbm.handle_uri import open_it
 

@@ -1,5 +1,6 @@
 import json
 import pathlib
+
 import bookmarks_parser
 
 tests_data_path = pathlib.Path(__file__).parent.resolve()

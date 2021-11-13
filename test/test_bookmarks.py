@@ -1,14 +1,7 @@
 import pytest
 
-from twbm.bookmarks import (
-    Bookmarks,
-    parse_tags,
-    check_tags,
-    match_all_tags,
-    match_any_tag,
-    clean_tags,
-    match_exact_tags,
-)
+from twbm.bookmarks import (Bookmarks, check_tags, clean_tags, match_all_tags,
+                            match_any_tag, match_exact_tags, parse_tags)
 
 
 @pytest.mark.parametrize(

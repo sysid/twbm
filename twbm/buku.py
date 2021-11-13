@@ -43,14 +43,14 @@ import unicodedata
 import webbrowser
 from enum import Enum
 from itertools import chain
-from subprocess import Popen, PIPE, DEVNULL
+from subprocess import DEVNULL, PIPE, Popen
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import urllib3
 from aiosql import aiosql
 from bs4 import BeautifulSoup
 from urllib3.exceptions import LocationParseError
-from urllib3.util import parse_url, make_headers, Retry
+from urllib3.util import Retry, make_headers, parse_url
 
 # note catch ModuleNotFoundError instead Exception
 # when python3.5 not supported
@@ -236,10 +236,13 @@ class BukuCrypt:
         """
 
         try:
-            from cryptography.hazmat.backends import default_backend
-            from cryptography.hazmat.primitives.ciphers import Cipher, modes, algorithms
             from getpass import getpass
             from hashlib import sha256
+
+            from cryptography.hazmat.backends import default_backend
+            from cryptography.hazmat.primitives.ciphers import (Cipher,
+                                                                algorithms,
+                                                                modes)
         except ImportError:
             LOGERR("cryptography lib(s) missing")
             sys.exit(1)
@@ -336,10 +339,13 @@ class BukuCrypt:
         """
 
         try:
-            from cryptography.hazmat.backends import default_backend
-            from cryptography.hazmat.primitives.ciphers import Cipher, modes, algorithms
             from getpass import getpass
             from hashlib import sha256
+
+            from cryptography.hazmat.backends import default_backend
+            from cryptography.hazmat.primitives.ciphers import (Cipher,
+                                                                algorithms,
+                                                                modes)
         except ImportError:
             LOGERR("cryptography lib(s) missing")
             sys.exit(1)

@@ -1,7 +1,7 @@
 import logging
 from typing import Sequence
 
-from twbm.db.dal import Bookmark, DAL
+from twbm.db.dal import DAL, Bookmark
 from twbm.environment import config
 
 _log = logging.getLogger(__name__)
