@@ -98,7 +98,7 @@ def show_bms(bms: Sequence[Bookmark], err: bool = True, show_timestamp: bool = F
         typer.secho("", err=err)
 
 
-def process(bms: Sequence[Bookmark]):
+def process(bms: Sequence[Bookmark]):  # noqa: max-complexity: 18
     help_text = """
         <n1> <n2>:      opens selection in browser
         p <n1> <n2>:    print id-list of selection
