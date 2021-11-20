@@ -6,7 +6,6 @@ import aiosql
 import pytest
 from alembic import command
 from alembic.config import Config
-
 from twbm.db.dal import DAL
 from twbm.environment import config
 

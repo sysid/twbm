@@ -1,17 +1,16 @@
-# You can set these variables from the command line, and also from the environment for the first two.
-SOURCEDIR     = source
-BUILDDIR      = build
-TESTDIR       = tests
+# You can set these variables from the command line, and also from the environment
+SOURCEDIR     = twbm
+TESTDIR       = test
 MAKE          = make
 
 VERSION       = $(shell cat twbm/__init__.py | grep __version__ | sed "s/__version__ = //" | sed "s/'//g")
 
 .DEFAULT_GOAL := help
 
-isort = isort --multi-line=3 --trailing-comma --force-grid-wrap=0 --combine-as --line-width 88 $(pkg_src) $(tests_src)
-black = black $(pkg_src) $(tests_src)
+isort = isort
+black = black
 tox = tox
-mypy = mypy $(pkg_src)
+mypy = mypy
 pipenv = pipenv
 
 .PHONY: all
@@ -74,8 +73,8 @@ tag:  ## tag with VERSION
 format:  ## format with black and isort
 	@echo "Formatting with black and isort"
 	#black --check --verbose --exclude="twbm/buku.py" .
-	black --verbose --exclude="twbm/buku.py" .
-	isort .
+	black --verbose --exclude="twbm/buku.py" $(SOURCEDIR)
+	isort $(SOURCEDIR)
 
 .PHONY: init
 init-db:  ## copy prod db to sql/bm.db and clean
@@ -100,6 +99,14 @@ bump-minor:  ## bump-minor
 bump-patch:  ## bump-patch
 	#bumpversion --dry-run --allow-dirty --verbose patch
 	bumpversion --verbose patch
+
+.PHONY: mypy
+mypy:  ## mypy
+	mypy --config-file setup.cfg $(SOURCEDIR)
+
+.PHONY: flake8
+flake8:  ## flake8
+	flake8 $(SOURCEDIR)
 
 .PHONY: help
 help: ## Show help message

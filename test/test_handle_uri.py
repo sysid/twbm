@@ -1,7 +1,6 @@
 import logging
 
 import pytest
-
 from twbm.handle_uri import open_it
 
 

@@ -1,5 +1,4 @@
 import pytest
-
 from twbm.twb import _update_tags
 
 

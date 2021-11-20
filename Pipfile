@@ -13,6 +13,7 @@ mock = "*"
 nuitka = "*"
 build = "*"
 pytest-mock = "*"
+flake8 = "*"
 
 [packages]
 # bookmarks-parser = "*"

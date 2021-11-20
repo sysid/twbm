@@ -1,7 +1,6 @@
 import pytest
-from typer.testing import CliRunner
-
 from twbm import app
+from typer.testing import CliRunner
 
 runner = CliRunner()
 
