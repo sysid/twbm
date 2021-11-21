@@ -3,7 +3,7 @@ import os
 import sys
 import webbrowser
 from os import isatty
-from typing import List, Sequence
+from typing import List, Sequence, Optional, Iterable
 
 # import for nuitka
 # noinspection PyUnresolvedReferences
@@ -42,8 +42,8 @@ fts_sql = """
 
 def _update_tags(
     ids: Sequence[int],
-    tags: Sequence[str] = None,
-    tags_not: Sequence[str] = None,
+    tags: Optional[Sequence[str]] = None,
+    tags_not: Optional[Sequence[str]] = None,
     force: bool = False,
 ):
     bms = Bookmarks(fts_query="").bms
@@ -53,16 +53,19 @@ def _update_tags(
         tags_not = ()
 
     with DAL(env_config=config) as dal:
+        # to allow for redefinition: set -> list
+        # (https://mypy.readthedocs.io/en/stable/common_issues.html#redefinitions-with-incompatible-types)
+        new_tags: Iterable
         for id in ids:
             bm = bms[id - 1]
             if force:
                 new_tags = set(tags)
             else:
                 new_tags = (set(bm.split_tags) | set(tags)) - set(tags_not)
-            new_tags = sorted(list(new_tags))
-            new_tags = f",{','.join(new_tags)},"
-            _log.debug(f"{new_tags=}")
-            bm.tags = new_tags
+            new_tags = sorted(new_tags)
+            new_tags_str = f",{','.join(new_tags)},"
+            _log.debug(f"{new_tags_str=}")
+            bm.tags = new_tags_str
             dal.update_bookmark(bm)
 
             show_bms((bm,))
@@ -109,7 +112,7 @@ def process(bms: Sequence[Bookmark]):  # noqa: max-complexity: 18
         h:              help
     """
     typer.secho(f"Selection: ", fg=typer.colors.GREEN, err=True)
-    selection = [x for x in input().split()]
+    selection: List = input().split()
 
     try:
         # open it if no command letter
@@ -125,7 +128,7 @@ def process(bms: Sequence[Bookmark]):  # noqa: max-complexity: 18
         # with command letter
         cmd = str(selection[0])
         selection = sorted([int(x) for x in selection[1:]])
-        ids = list()
+        ids = []
 
         if cmd == "p":
             if len(selection) == 0:
@@ -150,8 +153,6 @@ def process(bms: Sequence[Bookmark]):  # noqa: max-complexity: 18
 
         elif cmd == "e":
             if len(selection) == 0:
-                # typer.echo(f"-W- no selection. Do nothing.")
-                # raise typer.Exit()
                 for bm in bms:
                     _ = BukuDb(dbfile=config.dbfile).edit_update_rec(
                         index=bm.id, immutable=1
@@ -255,7 +256,7 @@ def search(
     if order_desc:
         bms = sorted(bms, key=lambda bm: bm.last_update_ts)
     elif order_asc:
-        bms = list(reversed(sorted(bms, key=lambda bm: bm.last_update_ts)))
+        bms = sorted(bms, key=lambda bm: bm.last_update_ts, reverse=True)
     else:
         bms = sorted(bms, key=lambda bm: bm.metadata.lower() if bm.metadata else "")
 
@@ -310,9 +311,9 @@ def update(
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
     if tags is not None:
-        tags = tags.lower().replace(" ", "").split(",")
+        tags = tags.lower().replace(" ", "").split(",")  # type: ignore
     if tags_not is not None:
-        tags_not = tags_not.lower().replace(" ", "").split(",")
+        tags_not = tags_not.lower().replace(" ", "").split(",")  # type: ignore
 
     # Gotcha: running from IDE looks like pipe
     is_pipe = not isatty(sys.stdin.fileno())
@@ -321,13 +322,13 @@ def update(
         ids = sys.stdin.readline()
 
     try:
-        ids = [int(x.strip()) for x in ids.split(",")]
+        id_list = [int(x.strip()) for x in ids.split(",")]
     except ValueError:
-        typer.secho(f"-E- Wrong input format.", color=typer.colors.RED, err=True)
+        typer.secho(f"-E- Wrong input format.", fg=typer.colors.RED, err=True)
         raise typer.Abort()
 
-    print(ids)
-    _update_tags(ids, tags, tags_not, force=force)
+    print(id_list)
+    _update_tags(id_list, tags, tags_not, force=force)
 
 
 @app.command()
@@ -356,9 +357,9 @@ def open(
         ids = sys.stdin.readline()
 
     try:
-        ids = [int(x.strip()) for x in ids.split(",")]
+        ids = [int(x.strip()) for x in ids.split(",")]  # type: ignore
     except ValueError:
-        typer.secho(f"-E- Wrong input format.", color=typer.colors.RED, err=True)
+        typer.secho(f"-E- Wrong input format.", fg=typer.colors.RED, err=True)
         raise typer.Abort()
 
     print(ids)
@@ -372,7 +373,7 @@ def open(
             else:
                 typer.secho(
                     "-W- Only HTTP implemented for direct open.",
-                    color=typer.colors.RED,
+                    fg=typer.colors.RED,
                     err=True,
                 )
 
@@ -413,7 +414,7 @@ def add(
         if editor is None:
             typer.secho(
                 f"Editor not set, please set environment variable EDITOR",
-                color=typer.colors.RED,
+                fg=typer.colors.RED,
                 err=True,
             )
             raise typer.Exit()
@@ -448,7 +449,7 @@ def show(
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
 
-    # _ = BukuDb(dbfile=config.dbfile).print_rec(index=id_)
+    # _ = BukuDb(dbfile=config.dbfile).print_rec(index=id_)  # noqa E800
     with DAL(env_config=config) as dal:
         bm = dal.get_bookmark_by_id(id_=id_)
         show_bms((bm,))

@@ -21,6 +21,7 @@ pep8-naming = "*"
 flake8-bugbear = "*"
 flake8-eradicate = "*"
 flake8-comprehensions = "*"
+mypy = "*"
 
 [packages]
 # bookmarks-parser = "*"

@@ -112,6 +112,12 @@ flake8:  ## flake8
 complexity:  ## measure complexity KPIs
 	radon cc --show-complexity --min C --exclude '**/buku*' $(SOURCEDIR)
 
+.PHONY: pyroma
+pyroma:  ## measure package best practice compliance
+	pyroma --min 9 .
+
+quality: mypy flake8 pyroma  ## total quality check
+
 .PHONY: help
 help: ## Show help message
 	@IFS=$$'\n' ; \
