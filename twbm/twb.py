@@ -119,7 +119,7 @@ def process(bms: Sequence[Bookmark]):  # noqa: max-complexity: 18
                 uri = bms[i].URL
                 open_it(uri)
             return
-        except ValueError as e:
+        except ValueError:
             pass
 
         # with command letter
@@ -172,7 +172,7 @@ def process(bms: Sequence[Bookmark]):  # noqa: max-complexity: 18
         else:
             typer.secho(f"-E- Invalid command {cmd}\n", err=True)
             typer.echo(help_text, err=True)
-    except IndexError as e:
+    except IndexError:
         typer.secho(
             f"-E- Selection {selection} out of range.",
             err=True,
@@ -297,9 +297,11 @@ def update(
     verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     """
-    Updates bookmarks with tags, either removes tags, add tags or overwrites entire taglist.
+    Updates bookmarks with tags:
+    either removes tags, add tags or overwrites entire taglist.
 
-    Gotcha: in order to allow for piped input, ids must be separated by comma with no blanks.
+    Gotcha:
+    in order to allow for piped input, ids must be separated by comma with no blanks.
 
     Example for using piped input:
 
@@ -314,14 +316,13 @@ def update(
 
     # Gotcha: running from IDE looks like pipe
     is_pipe = not isatty(sys.stdin.fileno())
-    ids_: Sequence[int] = list()
 
     if is_pipe:
         ids = sys.stdin.readline()
 
     try:
         ids = [int(x.strip()) for x in ids.split(",")]
-    except ValueError as e:
+    except ValueError:
         typer.secho(f"-E- Wrong input format.", color=typer.colors.RED, err=True)
         raise typer.Abort()
 
@@ -338,7 +339,8 @@ def open(
     """
     Opens bookmarks
 
-    Gotcha: in order to allow for piped input, ids must be separated by comma with no blanks.
+    Gotcha:
+    in order to allow for piped input, ids must be separated by comma with no blanks.
 
     Example for using piped input:
 
@@ -349,14 +351,13 @@ def open(
 
     # Gotcha: running from IDE looks like pipe
     is_pipe = not isatty(sys.stdin.fileno())
-    ids_: Sequence[int] = list()
 
     if is_pipe:
         ids = sys.stdin.readline()
 
     try:
         ids = [int(x.strip()) for x in ids.split(",")]
-    except ValueError as e:
+    except ValueError:
         typer.secho(f"-E- Wrong input format.", color=typer.colors.RED, err=True)
         raise typer.Abort()
 
@@ -473,14 +474,18 @@ def tags(
     # ctx: typer.Context,
     tag: str = typer.Argument(
         None,
-        help="tag for which related tags should be shown. No input: all tags are printed.",
+        help=(
+            "tag for which related tags should be shown. No input: all tags are"
+            " printed."
+        ),
     ),
     verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     """
     No parameter: Show all tags
 
-    With tag as parameter: Show related tags, i.e. tags which are used in combination with tag.
+    With tag as parameter:
+    Show related tags, i.e. tags which are used in combination with tag.
     """
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
