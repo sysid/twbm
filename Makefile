@@ -108,6 +108,10 @@ mypy:  ## mypy
 flake8:  ## flake8
 	flake8 $(SOURCEDIR)
 
+.PHONY: complexity
+complexity:  ## measure complexity KPIs
+	radon cc --show-complexity --min C --exclude '**/buku*' $(SOURCEDIR)
+
 .PHONY: help
 help: ## Show help message
 	@IFS=$$'\n' ; \
