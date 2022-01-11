@@ -1,6 +1,7 @@
 import pytest
-from twbm import app
 from typer.testing import CliRunner
+
+from twbm import app
 
 runner = CliRunner()
 
@@ -78,11 +79,18 @@ class TestHandleUri:
         assert result.exit_code == 0
 
 
-@pytest.mark.skip("Notnworking: not allowed operations: fileno()")
-def test_upgrade(dal):
-    result = runner.invoke(app, ["update", "-v", "-n", "aaa", "2,3"])
-    print(result.stdout)
-    assert result.exit_code == 0
+@pytest.mark.skip("Notworking: not allowed operations: fileno()")
+class TestManual:
+    """comment out everythng with `is_pipe`"""
+
+    def test_upgrade(self, dal):
+        result = runner.invoke(app, ["update", "-v", "-n", "aaa", "2,3"])
+        print(result.stdout)
+        assert result.exit_code == 0
+
+    def test_direct_open(self, dal):
+        result = runner.invoke(app, ["open", "-v", "9"])
+        print(result.stdout)
 
 
 def test_delete(dal):

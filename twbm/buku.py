@@ -240,9 +240,7 @@ class BukuCrypt:
             from hashlib import sha256
 
             from cryptography.hazmat.backends import default_backend
-            from cryptography.hazmat.primitives.ciphers import (Cipher,
-                                                                algorithms,
-                                                                modes)
+            from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
         except ImportError:
             LOGERR("cryptography lib(s) missing")
             sys.exit(1)
@@ -343,9 +341,7 @@ class BukuCrypt:
             from hashlib import sha256
 
             from cryptography.hazmat.backends import default_backend
-            from cryptography.hazmat.primitives.ciphers import (Cipher,
-                                                                algorithms,
-                                                                modes)
+            from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
         except ImportError:
             LOGERR("cryptography lib(s) missing")
             sys.exit(1)

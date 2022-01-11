@@ -4,6 +4,7 @@ import sys
 import webbrowser
 from os import isatty
 from typing import List, Sequence, Optional, Iterable
+from typing import TYPE_CHECKING
 
 # import for nuitka
 # noinspection PyUnresolvedReferences
@@ -15,6 +16,9 @@ from twbm.buku import BukuDb, edit_rec
 from twbm.db.dal import DAL, Bookmark
 from twbm.environment import config
 from twbm.handle_uri import open_it
+
+if TYPE_CHECKING:
+    pass
 
 _log = logging.getLogger(__name__)
 log_fmt = r"%(asctime)-15s %(levelname)s %(name)s %(funcName)s:%(lineno)d %(message)s"
@@ -253,12 +257,16 @@ def search(
     )
 
     # ordering of results
+    # cast to avoid mypy error: Returning Any from function declared to return "SupportsLessThan"
+    # https://github.com/python/mypy/issues/9656
+    k = lambda bm: bm.last_update_ts
     if order_desc:
-        bms = sorted(bms, key=lambda bm: bm.last_update_ts)
+        bms = sorted(bms, key=k)
     elif order_asc:
-        bms = sorted(bms, key=lambda bm: bm.last_update_ts, reverse=True)
+        bms = sorted(bms, key=k, reverse=True)
     else:
-        bms = sorted(bms, key=lambda bm: bm.metadata.lower() if bm.metadata else "")
+        k = lambda bm: bm.metadata.lower() if bm.metadata else ""
+        bms = sorted(bms, key=k)
 
     show_bms(bms, show_timestamp=order_desc or order_asc)
     typer.echo(f"Found: {len(bms)}", err=True)
@@ -371,11 +379,12 @@ def open(
             if bm.URL.startswith("http"):
                 webbrowser.open(bm.URL, new=2)
             else:
-                typer.secho(
-                    "-W- Only HTTP implemented for direct open.",
-                    fg=typer.colors.RED,
-                    err=True,
-                )
+                open_it(bm.URL)
+                # typer.secho(
+                #     "-W- Only HTTP implemented for direct open.",
+                #     fg=typer.colors.RED,
+                #     err=True,
+                # )
 
 
 @app.command()
