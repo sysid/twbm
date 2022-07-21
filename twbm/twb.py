@@ -405,8 +405,14 @@ def add(
     Provide URL (required) and tags (optional) as parameters.
 
     Example:
-
+        # Adding URL
         twbm add https://www.google.com tag1, tag2 --title "<title>"
+
+        # Adding URI to local files (uses platform standard to open file)
+        twmb add '$HOME/vimwiki/e4m/poker-points.png' --title 'Poker Points'
+
+        # Adding shell commands as URI
+        twbm add "shell::vim +/'# SqlAlchemy' sql.md" shell,sql,doc --title 'sqlalchemy snippets'
     """
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)

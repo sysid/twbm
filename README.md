@@ -53,6 +53,7 @@ twbm search -T tag1,tag2 -O
 
 # Adding URI to local files
 twbm add /home/user/presentation.pptx tag1,tag2 --title 'My super Presentation'
+twmb add '$HOME/vimwiki/e4m/poker-points.png' --title 'Poker Points'
 
 # Adding shell commands as URI
 twbm add "shell::vim +/'# SqlAlchemy' sql.md" shell,sql,doc --title 'sqlalchemy snippets'
