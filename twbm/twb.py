@@ -222,7 +222,7 @@ def search(
     Tags must be specified as comma separated list without blanks.
     Correct FTS search syntax: https://www.sqlite.org/fts5.html chapter 3.
 
-    Example:\n
+    Examples:\n
         twbm search 'security "single-page"'\n
         twbm search '"https://securit" *'\n
         twbm search '^security'\n
@@ -230,18 +230,20 @@ def search(
         twbm search 'security NOT keycloak'\n
         twbm search -t tag1,tag2 -n notag1 <searchquery>\n
         twbm search -e tag1,tag2\n
-        twbm search xxxxx | twbm update -t x (interactive selection)\n
+
+        # Interactiv select and pipe result downstream for processing         :
+        twbm search xxxxx | twbm update -t x\n
+
+        # Open all matching sites non-interactively                           :
+        twbm search poker --np | twbm open\n
+
 
     \nCommands in interactive mode:\n
         <n1> <n2>:      opens selection in browser\n
         p <n1> <n1>:    prints corresponding id-list of selection\n
         p:              prints all ids\n
         d <n1> <n1>:    delete selection\n
-
-            p <n1> <n2>:    print id-list of selection
-            p:              print all ids
-            d <n1> <n2>:    delete selection
-            h:              help
+        h:              help\n
     """
     if tags_prefix is not None:
         if tags_all is None:
@@ -404,14 +406,13 @@ def add(
 
     Provide URL (required) and tags (optional) as parameters.
 
-    Example:
-        # Adding URL
-        twbm add https://www.google.com tag1, tag2 --title "<title>"
+    Example:\n
+        twbm add https://www.google.com tag1, tag2 --title "<title>"\n
 
-        # Adding URI to local files (uses platform standard to open file)
+        # Adding URI to local files (uses platform standard to open file)     :
         twmb add '$HOME/vimwiki/e4m/poker-points.png' --title 'Poker Points'
 
-        # Adding shell commands as URI
+        # Adding shell commands as URI                                        :
         twbm add "shell::vim +/'# SqlAlchemy' sql.md" shell,sql,doc --title 'sqlalchemy snippets'
     """
     if verbose:

@@ -14,6 +14,8 @@ Features:
 - full-text search across URIs
 - tags for URI classification
 - check tags for consistency when adding new bookmark
+- pipe search results downstream for collective action, e.g. update, open, ...
+- open group of URIs non-interactively, e.g. open all URIs regarding Poker simultaneously
 
 Inspired by https://github.com/jarun/buku.
 If you are happy using [buku](https://github.com/jarun/buku), by all means stick with it. It is battle tested.
@@ -44,6 +46,9 @@ twbm search -t tag1,tag2 -n notag1 <searchquery>
 
 # Match exact taglist
 twbm search -e tag1,tag2
+
+# Open all matching sites non-interactively
+twbm search poker --np | twbm open
 
 # Search -> select interactively -> pipe bookmark id downstream for processing
 twbm search xxxxx | twbm update -t x
