@@ -137,14 +137,6 @@ bump-minor:  ## bump-minor
 bump-patch:  ## bump-patch
 	bumpversion --commit --verbose patch
 
-.PHONY: mypy
-mypy:  ## mypy
-	mypy --config-file setup.cfg $(SOURCEDIR)
-
-.PHONY: flake8
-flake8:  ## flake8
-	flake8 $(SOURCEDIR)
-
 .PHONY: complexity
 complexity:  ## measure complexity KPIs
 	radon cc --show-complexity --min C --exclude '**/buku*' $(SOURCEDIR)
@@ -152,23 +144,3 @@ complexity:  ## measure complexity KPIs
 .PHONY: pyroma
 pyroma:  ## measure package best practice compliance
 	pyroma --min 9 .
-
-quality: mypy flake8 pyroma  ## total quality check
-
-.PHONY: help
-help: ## Show help message
-	@IFS=$$'\n' ; \
-	help_lines=(`fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##/:/'`); \
-	printf "%s\n\n" "Usage: make [task]"; \
-	printf "%-20s %s\n" "task" "help" ; \
-	printf "%-20s %s\n" "------" "----" ; \
-	for help_line in $${help_lines[@]}; do \
-		IFS=$$':' ; \
-		help_split=($$help_line) ; \
-		help_command=`echo $${help_split[0]} | sed -e 's/^ *//' -e 's/ *$$//'` ; \
-		help_info=`echo $${help_split[2]} | sed -e 's/^ *//' -e 's/ *$$//'` ; \
-		printf '\033[36m'; \
-		printf "%-20s %s" $$help_command ; \
-		printf '\033[0m'; \
-		printf "%s\n" $$help_info; \
-	done
