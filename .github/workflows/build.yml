@@ -24,9 +24,17 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install sqlite3
+        run: |
+          sudo apt update
+          sudo apt upgrade
+          sudo apt install sqlite3
+          sqlite3 --version
+          echo "pragma compile_options;" | sqlite3
 
       - name: Install dependencies
         run: |
@@ -35,7 +43,7 @@ jobs:
 
       - name: Run tox
         run: |
-          make tox
+          LD_LIBRARY_PATH=/usr/local/lib make tox
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

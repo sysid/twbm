@@ -36,7 +36,7 @@ all: clean build upload tag  ## Build and upload
 coverage:  ## Run tests with coverage
 	python -m coverage erase
 	#python -m coverage run --include=$(pkg_src)/* --omit="$(pkg_src)/text.py" -m pytest -ra
-	TWBM_DB_URL=sqlite:///test/tests_data/bm_test.db python -m coverage run --include=$(pkg_src)/* -m pytest -ra
+	TWBM_DB_URL=sqlite:///test/tests_data/bm_test.db python -m coverage run --include=$(pkg_src)/* --omit=$(pkg_src)/buku.py -m pytest -ra
 	#python -m coverage report -m
 	python -m coverage html
 	python -m coverage report -m

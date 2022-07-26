@@ -133,8 +133,8 @@ diff buku.py buku
 Pycharm run configuration interferes with piping. Testing/Running only possible on CLI.
 This affects the following commands: `open, update`
 
-## Roadmap
-- tbd
+## todo
+- github actions sqlite FTS5 module not working proberly, so builds are failing
 
 <!-- Badges -->
 [pypi-image]: https://img.shields.io/pypi/v/twbm?color=blue
