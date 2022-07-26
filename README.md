@@ -1,6 +1,8 @@
 # twbm: URI Management and WEB-Browsing via Commandline (CLI)
 
 [![PyPI Version][pypi-image]][pypi-url]
+[![Build Status][build-image]][build-url]
+[![Code Coverage][coverage-image]][coverage-url]
 
 [sysid blog: twbm](https://sysid.github.io/twbm/)
 
@@ -20,10 +22,10 @@ Features:
 Inspired by https://github.com/jarun/buku.
 If you are happy using [buku](https://github.com/jarun/buku), by all means stick with it. It is battle tested.
 
-[twbm](https://github.com/sysid/twbm) is 100% buku compatible.   
+[twbm](https://github.com/sysid/twbm) is 100% buku compatible.
 Switch back and forth between **twbm** and **buku** is possible without data loss.
 
-To harness `twbm`'s power use full-text query syntax (see: https://www.sqlite.org/fts5.html chapter 3). 
+To harness `twbm`'s power use full-text query syntax (see: https://www.sqlite.org/fts5.html chapter 3).
 
 ## Usage
 Two complementary commands are provided:
@@ -76,13 +78,13 @@ After selection the program ends and returns to the command line prompt.
 ```bash
 pipx twbm
 ```
-Database schema upgrade:  
-- To upgrade existing buku-db: `twbm-upgrade-db.sh buku.db twbm.db`.  
-- To downgrade twbm-db: `twbm-downgrade-db.sh twbm.db buku.db`.  
+Database schema upgrade:
+- To upgrade existing buku-db: `twbm-upgrade-db.sh buku.db twbm.db`.
+- To downgrade twbm-db: `twbm-downgrade-db.sh twbm.db buku.db`.
 
 All transactions do not affect existing databases.
 
-Tested configuration:  
+Tested configuration:
 - sqlite 3.36.0 (requires update on macOS)
 - macOS 10.15.7
 
@@ -97,14 +99,14 @@ alias bbb="TWBM_DB_URL=sqlite:////$HOME/bm.db twbm"
 ```
 
 ## Architecture
-**twbm** uses a few `buku` functions in the background, but is generally rebuilt on top of: 
--  [Typer](https://typer.tiangolo.com/)  
--  [Pydantic](https://pydantic-docs.helpmanual.io/)  
--  [SQLite FTS5](https://www.sqlite.org/fts5.html)  
--  [aiosql](https://nackjicholson.github.io/aiosql/)  
--  [SQLAlchemy](https://www.sqlalchemy.org/)  
--  [alembic](https://alembic.sqlalchemy.org/en/latest/index.html)  
-  
+**twbm** uses a few `buku` functions in the background, but is generally rebuilt on top of:
+-  [Typer](https://typer.tiangolo.com/)
+-  [Pydantic](https://pydantic-docs.helpmanual.io/)
+-  [SQLite FTS5](https://www.sqlite.org/fts5.html)
+-  [aiosql](https://nackjicholson.github.io/aiosql/)
+-  [SQLAlchemy](https://www.sqlalchemy.org/)
+-  [alembic](https://alembic.sqlalchemy.org/en/latest/index.html)
+
 This should make it easy to extend and add functionality in an object-oriented manner.
 
 

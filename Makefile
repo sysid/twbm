@@ -1,36 +1,36 @@
+.DEFAULT_GOAL := help
+
 # You can set these variables from the command line, and also from the environment
 SOURCEDIR     = twbm
 TESTDIR       = test
 MAKE          = make
+VERSION       = $(shell cat VERSION)
 
-VERSION       = $(shell cat twbm/__init__.py | grep __version__ | sed "s/__version__ = //" | sed "s/'//g")
+app_root = $(PROJ_DIR)
+app_root ?= .
+pkg_src =  $(app_root)/twbm
+tests_src = $(app_root)/test
 
-.DEFAULT_GOAL := help
+define PRINT_HELP_PYSCRIPT
+import re, sys
 
-isort = isort
-black = black
-tox = tox
-mypy = mypy
-pipenv = pipenv
+for line in sys.stdin:
+	match = re.match(r'^([a-zA-Z0-9_-]+):.*?## (.*)$$', line)
+	if match:
+		target, help = match.groups()
+		print("\033[36m%-20s\033[0m %s" % (target, help))
+endef
+export PRINT_HELP_PYSCRIPT
+
+.PHONY: help
+help:
+	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
 .PHONY: all
-all: clean build upload tag
+all: clean build upload tag  ## Build and upload
 	@echo "--------------------------------------------------------------------------------"
 	@echo "-M- building and distributing"
 	@echo "--------------------------------------------------------------------------------"
-
-.PHONY: tox
-tox:   ## Run tox
-	$(tox)
-
-.PHONY: test
-test:  ## run tests
-#	./scripts/test
-	TWBM_DB_URL=sqlite:///test/tests_data/bm_test.db python -m py.test test -vv
-
-.PHONY: test-shell
-test-shell:  ## run tests
-	./scripts/test-pipe.sh
 
 .PHONY: coverage
 coverage:  ## Run tests with coverage
@@ -43,19 +43,18 @@ coverage:  ## Run tests with coverage
 	python -m coverage xml
 	open htmlcov/index.html  # work on macOS
 
-.PHONY: clean
-clean:  ## remove ./dist
-	@echo "Cleaning up..."
-	#git clean -Xdf
-	rm -rf ./dist
+.PHONY: test
+test:  ## run tests
+	#TWBM_DB_URL=sqlite:///test/tests_data/bm_test.db python -m py.test test -vv
+	TWBM_DB_URL=sqlite:///test/tests_data/bm_test.db python -m pytest -ra --junitxml=report.xml --cov-config=setup.cfg --cov-report=xml --cov-report term --cov=$(pkg_src) -vv test/
+
+.PHONY: test-shell
+test-shell:  ## run tests
+	./scripts/test-pipe.sh
 
 .PHONY: build
-build: clean  ## build
+build: clean  format isort  ## format and build
 	@echo "building"
-#	git add .
-#	git commit
-#	git push
-	#python setup.py sdist
 	python -m build
 
 .PHONY: upload
@@ -69,17 +68,54 @@ tag:  ## tag with VERSION
 	git tag -a $(VERSION) -m "version $(VERSION)"
 	git push --tags
 
+.PHONY: clean
+clean: clean-build clean-pyc  ## remove all build, test, coverage and Python artifacts
+
+.PHONY: clean-build
+clean-build: ## remove build artifacts
+	rm -fr build/
+	rm -fr dist/
+	rm -fr .eggs/
+	find . \( -path ./env -o -path ./venv -o -path ./.env -o -path ./.venv \) -prune -o -name '*.egg-info' -exec rm -fr {} +
+	find . \( -path ./env -o -path ./venv -o -path ./.env -o -path ./.venv \) -prune -o -name '*.egg' -exec rm -f {} +
+
+.PHONY: clean-pyc
+clean-pyc: ## remove Python file artifacts
+	find . -name '*.pyc' -exec rm -f {} +
+	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*~' -exec rm -f {} +
+	find . -name '__pycache__' -exec rm -fr {} +
+
+.PHONY: style
+style: isort format  ## perform code style format (black, isort)
+
 .PHONY: format
-format:  ## format with black and isort
-	@echo "Formatting with black and isort"
-	#black --check --verbose --exclude="twbm/buku.py" .
-	black --verbose --exclude="twbm/buku.py" $(SOURCEDIR)
-	isort $(SOURCEDIR)
+format:  ## perform black formatting
+	black --verbose --exclude="twbm/buku.py" $(pkg_src) test
+
+.PHONY: isort
+isort:  ## apply import sort ordering
+	isort . --profile black
+
+.PHONY: lint
+lint: flake8 mypy ## lint code with all static code checks
+
+.PHONY: flake8
+flake8:  ## check style with flake8
+	@flake8 $(pkg_src)
+
+.PHONY: mypy
+mypy:  ## check type hint annotations
+	# keep config in setup.cfg for integration with PyCharm
+	mypy --config-file setup.cfg $(pkg_src)
+
+.PHONY: tox
+tox:   ## Run tox
+	tox
 
 .PHONY: init
 init-db:  ## copy prod db to sql/bm.db and clean
 	@cp -v $(HOME)/vimwiki/buku/bm.db $(HOME)/dev/py/twbm/sql/bm.db
-
 
 .PHONY: install
 install: clean build uninstall ## pipx install
@@ -89,16 +125,17 @@ install: clean build uninstall ## pipx install
 uninstall:  ## pipx uninstall
 	-pipx uninstall twbm
 
+.PHONY: bump-major
+bump-major:  ## bump-major
+	bumpversion --commit --verbose major
+
 .PHONY: bump-minor
 bump-minor:  ## bump-minor
-	#bumpversion --dry-run --allow-dirty --verbose patch
-	#bumpversion --verbose patch
-	bumpversion --verbose minor
+	bumpversion --commit --verbose minor
 
 .PHONY: bump-patch
 bump-patch:  ## bump-patch
-	#bumpversion --dry-run --allow-dirty --verbose patch
-	bumpversion --verbose patch
+	bumpversion --commit --verbose patch
 
 .PHONY: mypy
 mypy:  ## mypy

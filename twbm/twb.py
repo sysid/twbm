@@ -3,14 +3,12 @@ import os
 import sys
 import webbrowser
 from os import isatty
-from typing import List, Sequence, Optional, Iterable
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable, List, Optional, Sequence
 
 # import for nuitka
 # noinspection PyUnresolvedReferences
 import sqlalchemy.sql.default_comparator  # noqa: F401
 import typer
-
 from twbm.bookmarks import Bookmarks, check_tags, clean_tags, parse_tags
 from twbm.buku import BukuDb, edit_rec
 from twbm.db.dal import DAL, Bookmark
