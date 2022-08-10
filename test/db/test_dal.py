@@ -1,4 +1,5 @@
 import pytest
+
 from twbm import buku
 from twbm.db.dal import DAL, Bookmark, metadata
 from twbm.environment import config

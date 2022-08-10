@@ -47,7 +47,6 @@ from subprocess import DEVNULL, PIPE, Popen
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import urllib3
-from aiosql import aiosql
 from bs4 import BeautifulSoup
 from urllib3.exceptions import LocationParseError
 from urllib3.util import Retry, make_headers, parse_url
@@ -157,8 +156,7 @@ else:
 
     CA_CERTS = certifi.where()
 
-sql_str = """
--- name: create_db#
+create_table_sql = """
 CREATE TABLE IF NOT EXISTS "main"."bookmarks" (
     "id" INTEGER PRIMARY KEY,
     "URL" TEXT NOT NULL UNIQUE,
@@ -168,7 +166,9 @@ CREATE TABLE IF NOT EXISTS "main"."bookmarks" (
     "flags" integer default '',
     "last_update_ts" DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+"""
 
+create_trigger_sql = """
 CREATE TRIGGER IF NOT EXISTS [UpdateLastTime]
     AFTER
     UPDATE
@@ -179,7 +179,6 @@ BEGIN
     update bookmarks set last_update_ts=CURRENT_TIMESTAMP where id=OLD.id;
 END;
 """
-queries = aiosql.from_str(sql_str, "sqlite3")
 
 
 class BukuCrypt:
@@ -571,7 +570,9 @@ class BukuDb:
             # flags: designed to be extended in future using bitwise masks
             # Masks:
             #     0b00000001: set title immutable
-            queries.create_db(conn)
+            # queries.create_db(conn)
+            conn.execute(create_table_sql)
+            conn.execute(create_trigger_sql)
             conn.commit()
         except Exception as e:
             LOGERR("initdb(): %s", e)
