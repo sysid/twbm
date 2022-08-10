@@ -7,7 +7,7 @@ export TWBM_DB_URL=sqlite:///sql/bm.db
 
 init-db () {
   # always pull prod db, part of .gititnore, tests-entries are in prod db
-  cp ~/vimwiki/buku/bm.db $PROJ_DIR/sql/bm.db
+  cp -v ~/vimwiki/buku/bm.db $PROJ_DIR/sql/bm.db
 }
 
 
@@ -37,6 +37,13 @@ test-pipe-update-interactive () {
   python ./twbm/twb.py search --np xxxxx
 }
 
+test-pipe-delete () {
+  echo "-M- ------------------------------ ${FUNCNAME[0]} ------------------------------"
+  init-db
+  echo "-----------M- should delete in reverse order 1,2 and accept/ignore blanks"
+  echo 1, 2 | python ./twbm/twb.py delete
+}
+
 
 ################################################################################
 #main
@@ -47,6 +54,7 @@ pushd $PROJ_DIR || exit
 
 #tests-pipe-update
 #tests-pipe-update-interactive
-test-pipe-open
+#test-pipe-open
+test-pipe-delete
 
 popd || exit

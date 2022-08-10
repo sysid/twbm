@@ -289,7 +289,7 @@ def delete(
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
 
-    # Gotcha: running from IDE looks like pipe
+    # Gotcha: running from IDE looks like pipe, comment out for testing
     is_pipe = not isatty(sys.stdin.fileno())
 
     if is_pipe:
@@ -301,13 +301,12 @@ def delete(
         typer.secho(f"-E- Wrong input format.", fg=typer.colors.RED, err=True)
         raise typer.Abort()
 
-    raise typer.Exit()
-
-    # use buku because of DB compactdb
-    with DAL(env_config=config) as dal:
-        bm = dal.get_bookmark_by_id(id_=id_)
-        show_bms((bm,))
-    _ = BukuDb(dbfile=config.dbfile).delete_rec(index=id_, delay_commit=False)
+    for id_ in sorted(id_list, reverse=True):
+        # use buku because of DB compactdb
+        with DAL(env_config=config) as dal:
+            bm = dal.get_bookmark_by_id(id_=id_)
+            show_bms((bm,))
+        _ = BukuDb(dbfile=config.dbfile).delete_rec(index=id_, delay_commit=False)
 
 
 @app.command()
@@ -339,7 +338,7 @@ def update(
     if tags_not is not None:
         tags_not = tags_not.lower().replace(" ", "").split(",")  # type: ignore
 
-    # Gotcha: running from IDE looks like pipe
+    # # Gotcha: running from IDE looks like pipe, comment out for testing
     is_pipe = not isatty(sys.stdin.fileno())
 
     if is_pipe:
@@ -374,7 +373,7 @@ def open(
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
 
-    # Gotcha: running from IDE looks like pipe
+    # Gotcha: running from IDE looks like pipe, comment out for testing
     is_pipe = not isatty(sys.stdin.fileno())
 
     if is_pipe:
