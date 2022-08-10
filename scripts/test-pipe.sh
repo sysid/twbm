@@ -3,10 +3,10 @@ set -Eeuo pipefail
 
 export LOG_LEVEL=DEBUG
 export TWBM_DB_URL=sqlite:///sql/bm.db
-#TWBM_DB_URL=sqlite:///test/tests_data/bm_test.db
+#TWBM_DB_URL=sqlite:///tests/tests_data/bm_test.db
 
 init-db () {
-  # always pull prod db, part of .gititnore, test-entries are in prod db
+  # always pull prod db, part of .gititnore, tests-entries are in prod db
   cp ~/vimwiki/buku/bm.db $PROJ_DIR/sql/bm.db
 }
 
@@ -45,8 +45,8 @@ echo "-M- Using: $TWBM_DB_URL"
 
 pushd $PROJ_DIR || exit
 
-#test-pipe-update
-#test-pipe-update-interactive
+#tests-pipe-update
+#tests-pipe-update-interactive
 test-pipe-open
 
 popd || exit

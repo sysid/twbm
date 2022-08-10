@@ -403,13 +403,13 @@ def data():
 # def init_db():
 #     p = Path(__file__).parent / 'tests_data'
 #     shutil.copy(p / 'bm_fts.db.bkp', p / 'bm_fts.db')
-#     print(f"Copying test database")
+#     print(f"Copying tests database")
 
 
 @pytest.fixture()
 def init_db():
-    # TWBM_DB_URL=sqlite:///test/tests_data/bm_test.db
-    dsn = os.environ.get("TWBM_DB_URL", "sqlite:///test/tests_data/bm_test.db")
+    # TWBM_DB_URL=sqlite:///tests/tests_data/bm_test.db
+    dsn = os.environ.get("TWBM_DB_URL", "sqlite:///tests/tests_data/bm_test.db")
     (Path(__file__).parent / "tests_data/bm_test.db").unlink(missing_ok=True)
     alembic_root = Path(__file__).parent.parent / "twbm/db"
 

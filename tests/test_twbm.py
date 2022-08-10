@@ -26,8 +26,8 @@ TEST_TEMP_DBDIR_PATH = os.path.join(TEST_TEMP_DIR_PATH, "buku")
 TEST_TEMP_DBFILE_PATH = os.path.join(TEST_TEMP_DBDIR_PATH, "bookmarks.db")
 
 """
-test for sort order:
-cls; python ./twbm/buku.py --db bm.db --np -t 'bb + py' --deep -- test
+tests for sort order:
+cls; python ./twbm/buku.py --db bm.db --np -t 'bb + py' --deep -- tests
 """
 
 
@@ -87,7 +87,7 @@ def test_initdb(setup):
 class ChromeTests:
     @pytest.mark.parametrize("add_pt", [True])
     def test_load_chrome_database(self, chrome_db, db, add_pt):
-        """test method."""
+        """tests method."""
         # compatibility
         json_file = chrome_db[0]
 
@@ -96,7 +96,7 @@ class ChromeTests:
 
     @pytest.mark.parametrize("add_pt", [True, False])
     def test_load_chrome_database_mock(self, chrome_db, db, add_pt):
-        """test method."""
+        """tests method."""
         # compatibility
         json_file = chrome_db[0]
 

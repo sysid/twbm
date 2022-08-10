@@ -76,8 +76,8 @@ def run_it(cmd: str):
 
 
 if __name__ == "__main__":
-    # cmd = "vim +/'## SqlAlchemy' ../test/tests_data/sample_docu.md"
-    # cmd = "vim +/'## SqlAlchemy' /Users/Q187392/dev/py/twbm/test/tests_data/sample_docu.md"
-    # cmd = "vim +/'## SqlAlchemy' $HOME/dev/py/twbm/test/tests_data/sample_docu.md"
-    cmd = "vim +/'## SqlAlchemy' ~/dev/py/twbm/test/tests_data/sample_docu.md"
+    # cmd = "vim +/'## SqlAlchemy' ../tests/tests_data/sample_docu.md"
+    # cmd = "vim +/'## SqlAlchemy' /Users/Q187392/dev/py/twbm/tests/tests_data/sample_docu.md"
+    # cmd = "vim +/'## SqlAlchemy' $HOME/dev/py/twbm/tests/tests_data/sample_docu.md"
+    cmd = "vim +/'## SqlAlchemy' ~/dev/py/twbm/tests/tests_data/sample_docu.md"
     run_it(cmd)
