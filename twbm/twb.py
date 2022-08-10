@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Iterable, List, Optional, Sequence
 # noinspection PyUnresolvedReferences
 import sqlalchemy.sql.default_comparator  # noqa: F401
 import typer
+
 from twbm.bookmarks import Bookmarks, check_tags, clean_tags, parse_tags
 from twbm.buku import BukuDb, edit_rec
 from twbm.db.dal import DAL, Bookmark
@@ -284,6 +285,7 @@ def delete(
     id_: int = typer.Argument(..., help="id to delete"),
     verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
+    """Delete search results in descending order of DB index."""
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
 
