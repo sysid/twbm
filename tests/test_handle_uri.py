@@ -11,8 +11,8 @@ class TestOpenIt:
         (
             ("https://www.google.com", "https://www.google.com"),
             (
-                "$HOME/dev/py/twbm/tests/tests_data/tests.pptx",
-                "/Users/Q187392/dev/py/twbm/tests/tests_data/tests.pptx",
+                "$HOME/dev/py/twbm/tests/tests_data/test.pptx",
+                "/Users/Q187392/dev/py/twbm/tests/tests_data/test.pptx",
             ),
             ("/Users/Q187392/dev", "/Users/Q187392/dev"),
             ("~/dev", "/Users/Q187392/dev"),

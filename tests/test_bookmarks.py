@@ -32,6 +32,7 @@ from twbm.bookmarks import (
 class TestBookmarks:
     def test_search_tags_exact(
         self,
+        dal,
         fts_query,
         tags_all,
         tags_all_not,

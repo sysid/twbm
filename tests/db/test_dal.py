@@ -15,6 +15,9 @@ def dal_pristine():
         yield dal
 
 
+def test_init_db(init_db):
+    _ = None
+
 def test_reset_db(dal):
     _ = None
 

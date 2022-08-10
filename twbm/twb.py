@@ -281,13 +281,27 @@ def search(
 
 @app.command()
 def delete(
-    # ctx: typer.Context,
-    id_: int = typer.Argument(..., help="id to delete"),
+    # id_: int = typer.Argument(..., help="id to delete"),
+    ids: str = typer.Argument(None, help="list of ids, separated by comma, no blanks"),
     verbose: bool = typer.Option(False, "-v", "--verbose"),
 ):
     """Delete search results in descending order of DB index."""
     if verbose:
         typer.echo(f"Using DB: {config.twbm_db_url}", err=True)
+
+    # Gotcha: running from IDE looks like pipe
+    is_pipe = not isatty(sys.stdin.fileno())
+
+    if is_pipe:
+        ids = sys.stdin.readline()
+
+    try:
+        id_list = [int(x.strip()) for x in ids.split(",")]
+    except ValueError:
+        typer.secho(f"-E- Wrong input format.", fg=typer.colors.RED, err=True)
+        raise typer.Abort()
+
+    raise typer.Exit()
 
     # use buku because of DB compactdb
     with DAL(env_config=config) as dal:

@@ -8,7 +8,7 @@ values ('http://xxxxx/yyyyy', 'TEST: entry for bookmark xxxx', ',ccc,xxx,yyy,', 
        ('http://none/none', '', ',,', '', 0),
        ('/Users/Q187392', 'home', ',,', '', 0),
        ('$HOME/dev', 'dev', ',,', '', 0),
-       ('$HOME/dev/py/twbm/tests/tests_data/tests.pptx', 'pptx', ',,', '', 0),
+       ('$HOME/dev/py/twbm/tests/tests_data/test.pptx', 'pptx', ',,', '', 0),
        ('shell::vim +/"## SqlAlchemy" $HOME/dev/py/twbm/tests/tests_data/sample_docu.md', 'shell open vim', ',,', '', 0)
        ;
 
