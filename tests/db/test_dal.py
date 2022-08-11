@@ -1,5 +1,4 @@
 import pytest
-
 from twbm import buku
 from twbm.db.dal import DAL, Bookmark, metadata
 from twbm.environment import config
@@ -17,6 +16,7 @@ def dal_pristine():
 
 def test_init_db(init_db):
     _ = None
+
 
 def test_reset_db(dal):
     _ = None

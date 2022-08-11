@@ -9,15 +9,15 @@
 Generic URI manager for the command line.
 
 Features:
-- manages URIs in sqlite database
-- know how to open HTTP URLs, directories, files (e.g. Office, Images, ....)
+- full-text search across URIs, manages URIs in sqlite FTS database
+- knows how to open HTTP URLs, directories, files (e.g. Office, Images, ....)
 - can execute URIs as shell commands via the protocol prefix: 'shell::'
   URI-Example: `shell::vim +/"## SqlAlchemy" $HOME/document.md`
-- full-text search across URIs
 - tags for URI classification
 - check tags for consistency when adding new bookmark
 - pipe search results downstream for collective action, e.g. update, open, ...
 - open group of URIs non-interactively, e.g. open all URIs regarding Poker simultaneously
+- can be integrated with URI navigator [vimania-uri](https://github.com/sysid/vimania-uri)
 
 Inspired by https://github.com/jarun/buku.
 If you are happy using [buku](https://github.com/jarun/buku), by all means stick with it. It is battle tested.
@@ -103,11 +103,13 @@ alias bbb="TWBM_DB_URL=sqlite:////$HOME/bm.db twbm"
 -  [Typer](https://typer.tiangolo.com/)
 -  [Pydantic](https://pydantic-docs.helpmanual.io/)
 -  [SQLite FTS5](https://www.sqlite.org/fts5.html)
--  [aiosql](https://nackjicholson.github.io/aiosql/)
 -  [SQLAlchemy](https://www.sqlalchemy.org/)
 -  [alembic](https://alembic.sqlalchemy.org/en/latest/index.html)
 
 This should make it easy to extend and add functionality in an object-oriented manner.
+
+## Changelog
+[Changelog](https://github.com/sysid/twbm/blob/main/CHANGELOG.md)
 
 
 # Development
@@ -124,7 +126,7 @@ diff buku.py buku
 
 ## Local installation from sources
 - install twbm with pipx for local development: `pipx install ~/dev/py/twbm`, via `make install`
-- uninstall: `pipx uninstall twbm`  # GOTCHA: NOT THE PATH !!!!
+- uninstall: `pipx uninstall twbm`
 
 ## Testing
 `make test`

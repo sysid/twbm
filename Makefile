@@ -93,7 +93,7 @@ style: isort format  ## perform code style format (black, isort)
 
 .PHONY: format
 format:  ## perform black formatting
-	black --verbose --exclude="twbm/buku.py" $(pkg_src) test
+	black --verbose --exclude="twbm/buku.py" $(pkg_src) tests
 
 .PHONY: isort
 isort:  ## apply import sort ordering
