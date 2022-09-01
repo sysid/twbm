@@ -18,11 +18,11 @@
     "default": {
         "aiosql": {
             "hashes": [
-                "sha256:644b488c17143c0897084db158977b44e1801805329bed8a7e0d34d5ac4aa0ef",
-                "sha256:b4b2b9a3ca129aa0fb44fa28d67d817bf4ac6c6fd663bfd15ed7e2c36562869d"
+                "sha256:79fb25162614afc35819576d1b9acde318da9ca17a0a64bf6062da98631c6eb0",
+                "sha256:f64d369b92f2d018444f64be3668c9f4ab1761b42453a875c9ff31b99ed52cef"
             ],
             "index": "pypi",
-            "version": "==6.2"
+            "version": "==6.3"
         },
         "alembic": {
             "hashes": [
