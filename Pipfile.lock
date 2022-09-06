@@ -18,11 +18,11 @@
     "default": {
         "aiosql": {
             "hashes": [
-                "sha256:79fb25162614afc35819576d1b9acde318da9ca17a0a64bf6062da98631c6eb0",
-                "sha256:f64d369b92f2d018444f64be3668c9f4ab1761b42453a875c9ff31b99ed52cef"
+                "sha256:5dbccf67049359a7360e733b00f26a699e0322920a82b09d93729a2dc54ae2d5",
+                "sha256:72622acf833dd245e9b8a68914df96fdb24b268e3dca8f553e52cf5747b72d23"
             ],
             "index": "pypi",
-            "version": "==6.3"
+            "version": "==6.4"
         },
         "alembic": {
             "hashes": [
@@ -374,11 +374,11 @@
         },
         "pathspec": {
             "hashes": [
-                "sha256:01eecd304ba0e6eeed188ae5fa568e99ef10265af7fd9ab737d6412b4ee0ab85",
-                "sha256:aefa80ac32d5bf1f96139dca67cefb69a431beff4e6bf1168468f37d7ab87015"
+                "sha256:46846318467efc4556ccfd27816e004270a9eeeeb4d062ce5e6fc7a87c573f93",
+                "sha256:7ace6161b621d31e7902eb6b5ae148d12cfd23f4a249b9ffb6b9fee12084323d"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==0.10.0"
+            "version": "==0.10.1"
         },
         "pexpect": {
             "hashes": [
@@ -405,11 +405,11 @@
         },
         "prompt-toolkit": {
             "hashes": [
-                "sha256:859b283c50bde45f5f97829f77a4674d1c1fcd88539364f1b28a37805cfd89c0",
-                "sha256:d8916d3f62a7b67ab353a952ce4ced6a1d2587dfe9ef8ebc30dd7c386751f289"
+                "sha256:9696f386133df0fc8ca5af4895afe5d78f5fcfe5258111c2a79a1c3e41ffa96d",
+                "sha256:9ada952c9d1787f52ff6d5f3484d0b4df8952787c087edf6a1f7c2cb1ea88148"
             ],
             "markers": "python_full_version >= '3.6.2'",
-            "version": "==3.0.30"
+            "version": "==3.0.31"
         },
         "ptyprocess": {
             "hashes": [
@@ -800,11 +800,11 @@
         },
         "pathspec": {
             "hashes": [
-                "sha256:01eecd304ba0e6eeed188ae5fa568e99ef10265af7fd9ab737d6412b4ee0ab85",
-                "sha256:aefa80ac32d5bf1f96139dca67cefb69a431beff4e6bf1168468f37d7ab87015"
+                "sha256:46846318467efc4556ccfd27816e004270a9eeeeb4d062ce5e6fc7a87c573f93",
+                "sha256:7ace6161b621d31e7902eb6b5ae148d12cfd23f4a249b9ffb6b9fee12084323d"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==0.10.0"
+            "version": "==0.10.1"
         },
         "pep517": {
             "hashes": [
