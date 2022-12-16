@@ -67,7 +67,7 @@ tag:  ## tag with VERSION
 
 .PHONY: install
 install: clean build uninstall ## pipx install
-	pipx install $(HOME)/dev/py/twbm
+	pipx install $(TW_GITHUB_ROOT)/public/twbm
 
 .PHONY: uninstall
 uninstall:  ## pipx uninstall
