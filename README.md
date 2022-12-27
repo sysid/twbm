@@ -1,7 +1,6 @@
 # twbm: URI Management and WEB-Browsing via Commandline (CLI)
 
 [![PyPI Version][pypi-image]][pypi-url]
-[![Build Status][build-image]][build-url]
 [![Code Coverage][coverage-image]][coverage-url]
 
 [sysid blog: twbm](https://sysid.github.io/twbm/)
