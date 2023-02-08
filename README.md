@@ -3,6 +3,8 @@
 [![PyPI Version][pypi-image]][pypi-url]
 [![Code Coverage][coverage-image]][coverage-url]
 
+### Reimplemented in Rust: 20x faster [bkmr](https://github.com/sysid/bkmr)
+
 [sysid blog: twbm](https://sysid.github.io/twbm/)
 
 Generic URI manager for the command line.
@@ -16,7 +18,6 @@ Features:
 - check tags for consistency when adding new bookmark
 - pipe search results downstream for collective action, e.g. update, open, ...
 - open group of URIs non-interactively, e.g. open all URIs regarding Poker simultaneously
-- can be integrated with URI navigator [vimania-uri](https://github.com/sysid/vimania-uri)
 
 Inspired by https://github.com/jarun/buku.
 If you are happy using [buku](https://github.com/jarun/buku), by all means stick with it. It is battle tested.
