@@ -313,7 +313,7 @@ def update(
     # ctx: typer.Context,
     ids: str = typer.Argument(None, help="list of ids, separated by comma, no blanks"),
     tags: str = typer.Option(None, "-t", "--tags", help="add tags to taglist"),
-    tags_not: str = typer.Option(None, "-n", "--tags", help="remove tags from taglist"),
+    tags_not: str = typer.Option(None, "-n", "--ntags", help="remove tags from taglist"),
     force: bool = typer.Option(
         False, "-f", "--force", help="overwrite taglist with tags"
     ),
