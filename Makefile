@@ -76,14 +76,33 @@ uninstall:  ## pipx uninstall
 .PHONY: bump-major
 bump-major:  ## bump-major
 	bumpversion --commit --verbose major
+	git push
+	git push --tags
+	@$(MAKE) create-release
 
 .PHONY: bump-minor
 bump-minor:  ## bump-minor
 	bumpversion --commit --verbose minor
+	git push
+	git push --tags
+	@$(MAKE) create-release
 
 .PHONY: bump-patch
 bump-patch:  ## bump-patch
 	bumpversion --commit --verbose patch
+	git push
+	git push --tags
+	@$(MAKE) create-release
+
+.PHONY: create-release
+create-release:  ## create a release on GitHub via the gh cli
+	@if command -v gh version &>/dev/null; then \
+		echo "Creating GitHub release for v$(VERSION)"; \
+		gh release create "v$(VERSION)" --generate-notes; \
+	else \
+		echo "You do not have the github-cli installed. Please create release from the repo manually."; \
+		exit 1; \
+	fi
 
 ################################################################################
 # Code Quality
