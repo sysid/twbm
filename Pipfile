@@ -29,6 +29,7 @@ certifi = "*"
 cryptography = "*"
 urllib3 = "*"
 pydantic = "*"
+pydantic-settings = "*"
 black = "==22.8.0"
 
 [requires]

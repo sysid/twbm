@@ -6,7 +6,7 @@ Edit service environment to override
 ################################################################################
 from pathlib import Path
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 ROOT_DIR = Path(__file__).parent.absolute()
 
