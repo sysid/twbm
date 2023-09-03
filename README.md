@@ -3,7 +3,13 @@
 [![PyPI Version][pypi-image]][pypi-url]
 [![Code Coverage][coverage-image]][coverage-url]
 
-### Reimplemented in Rust: 20x faster [bkmr](https://github.com/sysid/bkmr)
+# Update 1.9.2023: Reimplemented in Rust: 20x faster [bkmr](https://github.com/sysid/bkmr)
+[Blog Post: bkmr](https://sysid.github.io/bkmr/)
+
+** Please switch to the Rust version. It is worth it. **
+
+<br>
+
 
 [sysid blog: twbm](https://sysid.github.io/twbm/)
 
